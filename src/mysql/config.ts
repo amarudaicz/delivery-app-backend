@@ -5,7 +5,7 @@ const pool = mysql2.createPool({
   user: 'root',
   password: '',
   host: 'localhost',
-  database: 'delivery_test',
+  database: 'deli_app',
 });
 
 export const poolConnection = () => {
@@ -15,7 +15,7 @@ export const poolConnection = () => {
     } 
 
     console.log('R');
-  });
+  }); 
 };
 
 export const doQuery = (query: string, data: any[]) => {

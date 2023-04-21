@@ -8,7 +8,7 @@ import {
 } from '../controllers/products';
 const router = Router();
 
-router.get('/get-all/:local', getProducts);
+router.get('/:table', getProducts);
 
 router.get('/get-one/:local/:id', getProduct);
 

@@ -9,6 +9,7 @@ export const getLocal = async (req: Request, res: Response) => {
     const data = await doQuery('SELECT * FROM locals WHERE name_url = ?;', [
       local,
     ]);
+    
 
     if (data.length !== 0) return res.json(data);
 
