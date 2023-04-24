@@ -16,6 +16,6 @@ router.post('/post-one/:local', postProduct);
 
 router.delete('/delete-one/:local/:id', deleteProduct);
 
-router.put('/put-one/:local/:id', updateProduct);
+router.put('/put-one/:local', updateProduct);
 
 export { router };

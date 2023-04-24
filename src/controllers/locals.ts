@@ -1,5 +1,5 @@
 import { httpError } from '../utils/httpError';
-// import { doQuery } from '../mysql/config';
+import { doQuery } from '../mysql/config';
 import { Request, Response } from 'express';
 
 export const getLocal = async (req: Request, res: Response) => {

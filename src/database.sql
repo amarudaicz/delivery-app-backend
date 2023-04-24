@@ -29,9 +29,12 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `categories` (
   `id` int(11) NOT NULL,
+  `local_id` int(11) NOT NULL,
   `category_name` varchar(255) DEFAULT NULL,
-  `createdAt` datetime NOT NULL,
-  `updatedAt` datetime NOT NULL
+  `category_image` varchar(255) DEFAULT NULL,
+  
+  `createdAt` datetime DEFAULT current_timestamp(),
+  `updatedAt` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -46,23 +49,6 @@ INSERT INTO `categories` (`id`, `category_name`, `createdAt`, `updatedAt`) VALUE
 --
 -- Estructura de tabla para la tabla `elcaracol`
 --
-
-CREATE TABLE `elcaracol` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `price` longtext NOT NULL,
-  `ingredients` longtext DEFAULT NULL,
-  `id_category` int(11) NOT NULL,
-  `createdAt` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Volcado de datos para la tabla `elcaracol`
---
-
-INSERT INTO `elcaracol` (`id`, `name`, `price`, `ingredients`, `id_category`, `createdAt`) VALUES
-(1, 'Muzzarella', '{\'media\':500, \'completa\': 1000}', '[\'Huevo\',\'Jamon\',\'Tomate\']', 1, '2023-01-29 19:08:09');
-
 -- --------------------------------------------------------
 
 --
@@ -100,18 +86,13 @@ CREATE TABLE `puntopizza` (
   `name` varchar(255) NOT NULL,
   `price` longtext NOT NULL,
   `ingredients` longtext DEFAULT NULL,
+  `variations` longtext DEFAULT NULL,
+  `local_id` int NOT NULL,
   `id_category` int(11) NOT NULL,
   `createdAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Volcado de datos para la tabla `puntopizza`
---
 
-INSERT INTO `puntopizza` (`id`, `name`, `price`, `ingredients`, `id_category`, `createdAt`) VALUES
-(16, 'Muzzarella', '{\"media\":500, \"completa\": 1000}', '[\'Huevo\',\'Jamon\',\'Tomate\']', 1, '2023-01-29 18:55:10');
-
---
 -- Índices para tablas volcadas
 --
 
@@ -123,11 +104,6 @@ ALTER TABLE `categories`
 
 --
 -- Indices de la tabla `elcaracol`
---
-ALTER TABLE `elcaracol`
-  ADD UNIQUE KEY `id` (`id`),
-  ADD KEY `id_category` (`id_category`);
-
 --
 -- Indices de la tabla `locals`
 --
@@ -154,10 +130,6 @@ ALTER TABLE `categories`
 --
 -- AUTO_INCREMENT de la tabla `elcaracol`
 --
-ALTER TABLE `elcaracol`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
 -- AUTO_INCREMENT de la tabla `locals`
 --
 ALTER TABLE `locals`
@@ -173,13 +145,6 @@ ALTER TABLE `puntopizza`
 -- Restricciones para tablas volcadas
 --
 
---
--- Filtros para la tabla `elcaracol`
---
-ALTER TABLE `elcaracol`
-  ADD CONSTRAINT `elcaracol_ibfk_1` FOREIGN KEY (`id_category`) REFERENCES `categories` (`id`);
-
---
 -- Filtros para la tabla `puntopizza`
 --
 ALTER TABLE `puntopizza`
