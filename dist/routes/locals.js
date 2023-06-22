@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.router = void 0;
+const express_1 = require("express");
+const locals_1 = require("../controllers/locals");
+const checkToken_1 = require("../middleware/checkToken");
+const router = (0, express_1.Router)();
+exports.router = router;
+router.get('/get-all', locals_1.getAllLocals);
+router.get('/:local?', checkToken_1.checkToken, locals_1.getLocal);
+router.post('/get-recents', locals_1.getRecents);
+router.post('/post-one', locals_1.postLocal);
+router.post('/post-table', locals_1.createTableLocal);
+router.delete('/delete-one/:id', locals_1.deleteLocal);
+router.put('/put-one', checkToken_1.checkTokenStrict, locals_1.updateLocal);

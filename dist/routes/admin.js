@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.router = void 0;
+const express_1 = require("express");
+const admin_1 = require("../controllers/admin");
+const checkToken_1 = require("../middleware/checkToken");
+const router = (0, express_1.Router)();
+exports.router = router;
+router.get('/get-categories', checkToken_1.checkTokenStrict, admin_1.getCategories);
+router.post('/post-category', admin_1.postCategory);

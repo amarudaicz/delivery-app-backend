@@ -2,47 +2,61 @@ import { httpError } from "../utils/httpError";
 import { doQuery } from "../mysql/config";
 import { Request, Response } from "express";
 import { checkData } from "../utils/checkData";
+import { decode } from "jsonwebtoken";
+import { Admin } from "../interface/admin";
+import * as cloudinary from 'cloudinary'
+import { Product } from "../interface/product";
 
 export const getProducts = async (req: Request, res: Response) => {
   try {
-    const { table } = req.params;
-    const data = await doQuery(
+
+
+    const table: string = req.params.table || (req as any).user?.admin_table
+
+    console.log(table);
+
+    if (!table) {
+      return httpError(res, 'No hay tabla para consultar', 403)
+    }
+
+    //INTERFACE Product
+    let data: any[] = await doQuery(
       `SELECT ${table}.id, name, price, ingredients, ${table}.local_id, image, category_id, category_name, category_image, variations, description FROM ${table} INNER JOIN categories ON categories.id = ${table}.category_id AND categories.local_id = ${table}.local_id`,
       []
     );
 
+ 
     for (let i = 0; i < data.length; i++) {
-      data[i].variations = JSON.parse(data[i].variations)
-      data[i].ingredients = JSON.parse(data[i].ingredients)
-    }
+      data[i].variations ? data[i].variations = JSON.parse(data[i].variations) : null
+      data[i].ingredients ? data[i].ingredients = JSON.parse(data[i].ingredients) : null
+    } 
 
-    res.send(data);
+    res.json(data);
   } catch (err: any) {
     console.log(err);
 
-    httpError(res, err, 403);
-  }
+    httpError(res, 'ERROR_GET_PRODUCTS', 403);
+  } 
 };
 
 export const getProduct = async (req: Request, res: Response) => {
   try {
     const { local, id } = req.params;
+    const { admin_table } = (req as any).user
 
-    console.log(req.params);
-    
+
     const data = await doQuery(
       `SELECT ${local}.id, name, price, ingredients, category_id, category_name FROM ${local} INNER JOIN categories ON categories.id = ${local}.category_id AND categories.local_id = ${local}.local_id WHERE ${local}.id = ${Number(
         id
       )} `,
-      [false]
+      []
     );
-    console.log(data);
-    
+
 
     if (checkData(data))
-      return httpError(res, "No se han encotrado productos", 403);
+      return httpError(res, "No se han encotrado producto", 403);
 
-    res.json(data); 
+    res.json(data);
   } catch (err: any) {
     // httpError(res, err, 403);
     res.status(403).json({ error: "asd" });
@@ -51,72 +65,98 @@ export const getProduct = async (req: Request, res: Response) => {
 
 export const postProduct = async (req: Request, res: Response) => {
   try {
-    const { local } = req.params;
-
-    const {
-      name,
-      price,
-      ingredients,
-      category_id,
-      description,
-      variations,
-      local_id,
-      image
-    } = req.body;
-
-    console.log(req.body);
-
-    const data:any[] = await doQuery(
-      `INSERT INTO ${local} (name, local_id, image, price, ingredients, category_id, description, variations) VALUES(?,?,?,?,?,?,?,?) `,
-      [name, local_id, image, price, JSON.stringify(ingredients), category_id, description, JSON.stringify(variations)]
-    );
+    const user = (req as any).user as Admin;
+    const image = req.file;
+    let imageUrl = null;
     
-
-
-
-    res.send(data).status(201);
+    
+    const { name, price, category_id, description, variations, ingredients } = req.body as Product;
+    
+    console.log(req.body, ingredients);
+    if (image) {
+      const imageUpload = await cloudinary.v2.uploader.upload(image.path, { 
+        folder: user.admin_table,
+        public_id: name.replace(' ', '-' ).trim() || name,
+        overwrite: true,
+        quality: 90
+      });
+      console.log(imageUpload);
+      imageUrl = imageUpload.secure_url;
+    }
+    
+      const data = await doQuery(
+        `INSERT INTO ${user.admin_table} (name, local_id, image, price, ingredients, category_id, description, variations) VALUES(?,?,?,?,?,?,?,?)`,
+        [name, user.local_id, imageUrl, price, ingredients, category_id, description === 'null' ? null : description, variations]
+      );
+    
+    return res.json(data);
   } catch (err: any) {
+    console.log(err);
     httpError(res, err, 403);
   }
 };
 
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
-    const { id, local } = req.params;
+
+    const { id } = req.params
     
-    const data = await doQuery(`DELETE FROM ${local} WHERE id = ?;`, [id]);
+    const { admin_table } = (req as any).user;
+
+    console.log(id);
+    
+    const data = await doQuery(`DELETE FROM ${admin_table} WHERE id = ?;`, [Number(id)]);
 
     res.json(data);
   } catch (err: any) {
+    console.log(err);
+    
     httpError(res, err, 403);
   }
 };
 
 export const updateProduct = async (req: Request, res: Response) => {
   try {
-    const { local } = req.params;
+    const user  = (req as any).user as Admin;
 
+    const file = req.file;
+    let imageUrl = null;
+    
     const {
       id,
       name,
       price,
-      ingredients,
-      category_id,
       description,
       variations,
-      local_id,
+      ingredients,
       image
     } = req.body;
-    
+
     console.log(req.body);
     
+
+    if (file) {
+      const imageUpload = await cloudinary.v2.uploader.upload(file.path, {
+        folder: user.admin_table,
+        public_id: name,
+        overwrite: true,
+        quality: 90
+      });
+      
+      console.log(imageUpload);
+      imageUrl = imageUpload.secure_url;
+    }
+    
+
+
     const data = await doQuery(
-      `UPDATE ${local} SET name=?, image=?, price=?, ingredients=?, category_id=?, description=?, variations=?, local_id=? WHERE id = ? `,
-      [name, image, price, ingredients, category_id, description, JSON.stringify(variations), local_id ,id]
+      `UPDATE ${user.admin_table} SET name=?, image=?, price=?, ingredients=?, description=?, variations=? WHERE id = ? `,
+      [name, imageUrl ? imageUrl : (image === 'null' ? null : image), price, ingredients, description === 'null' ? null : description, variations, id]
     );
- 
+
     res.json(data);
   } catch (err: any) {
+    console.log(err);
     httpError(res, err, 403);
   }
 };

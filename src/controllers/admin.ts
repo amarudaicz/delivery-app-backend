@@ -1,6 +1,10 @@
 import { httpError } from '../utils/httpError';
 import { doQuery } from '../mysql/config';
 import { Request, Response } from 'express';
+import { Option, Product, Variation } from '../interface/product';
+import { User } from '../interface/user';
+import { Admin } from '../interface/admin';
+import * as uuid from 'uuid';
 
 export const postCategory = async (req: Request, res: Response) => {
   try {
@@ -22,7 +26,9 @@ export const postCategory = async (req: Request, res: Response) => {
 export const getCategories = async (req: Request, res: Response) => {
   try {
 
-    const {id:local_id} = req.params
+    console.log((req as any).user);
+    
+    const {local_id} = (req as any).user
 
     const data = await doQuery(`SELECT * FROM categories WHERE local_id = ? `, [local_id])
   
@@ -33,7 +39,110 @@ export const getCategories = async (req: Request, res: Response) => {
   }
 };
 
+export const postOptions = async (req: Request, res: Response) => {
+  try {
+    
+    const {local_id} = (req as any).user
+    const {options} = req.body
+    console.log(options);
+    
+
+    if (!options) {
+      httpError(res, 'No proporciono opciones')
+      return
+    }
+
+
+    const data = await doQuery(
+      `UPDATE locals SET 
+      options_group = ?
   
+      WHERE id = ?;`,
+      [JSON.stringify(options), local_id]
+    );
+
+    res.json(data)
+
+
+  } catch (err: any) {
+    httpError(res, err, 202);
+  }
+};
+
+
+export const putOptions = async (req: Request, res: Response) => {
+  try {
+    const user = ((req as any).user as Admin)
+    const {products, group, variations} = req.body //PRODUCTS IDS
+
+    const updateLocalOptions = await doQuery(`UPDATE locals SET options_group = ? WHERE id = ?`, [JSON.stringify(variations), user.local_id ])
+
+    if (!products.length) {
+      res.send(updateLocalOptions)
+      return
+    }
+
+    const productsRecovery:Product[] | any[] = await doQuery(`SELECT * FROM ${user.admin_table} WHERE id IN (${ products.join(',') })`, [user.local_id])
+
+
+    const updatedProducts = productsRecovery.map((product: any) => {
+      product.variations = JSON.parse(product.variations);
+      const index = product.variations.findIndex((variation: any) => variation.nameVariation === group.nameVariation);
+      product.variations[index] = group;
+      return product;
+    });
+    
+    // Construir la consulta SQL con múltiples valores
+    const updateQuery = `
+      UPDATE ${user.admin_table}
+      SET variations = CASE 
+        ${updatedProducts.map((product: any) => `WHEN id = ${product.id} THEN '${JSON.stringify(product.variations)}'`).join(' ')}
+        ELSE variations
+      END
+      WHERE id IN (${products.join(',')})
+    `;
+
+    const data = await doQuery(updateQuery, []);
+    console.log(data);
+    
+
+    res.send(data).status(200)
+
+  } catch (err: any) {
+    httpError(res, err, 202);
+  }
+};
+
+
+export const deleteOptionGroup = async (req: Request, res: Response) => {
+  try {
+
+    console.log((req as any).user);
+    
+    const {local_id} = (req as any).user
+    const {id:idGroup} = req.params
+
+    console.log(idGroup);
+    
+    let dataSet = await doQuery(`SELECT options_group FROM locals WHERE id = ?`, [local_id])
+    console.log({esto:dataSet});
+    dataSet = JSON.parse(dataSet[0].options_group)
+    dataSet = dataSet.filter((e:Variation)=> e.id !== Number(idGroup))
+    
+    
+    const data = await doQuery(`UPDATE locals SET options_group = ? WHERE id = ?` , [JSON.stringify(dataSet), local_id])
+
+    res.send(data).status(200)
+
+
+  } catch (err: any) {
+    console.log(err);
+    
+    httpError(res, err, 202);
+  }
+};
+
+
   
   
   
