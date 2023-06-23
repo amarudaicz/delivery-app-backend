@@ -10,7 +10,7 @@ export function cloudConfig(){
     }
     
     cloudinary.v2.config(config);
-    console.log('Cloud-In-Line');
+    console.log('Cloud-OnLine');
     
     
 }

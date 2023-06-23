@@ -1,12 +1,14 @@
 import { Router } from 'express';
 import { deleteOptionGroup, getCategories, postCategory, postOptions, putOptions } from '../controllers/admin';
 import { checkTokenStrict } from '../middleware/checkToken';
+import upload from '../config/multer';
+import multer from 'multer';
 
 const router = Router();
 
 router.get('/get-categories',checkTokenStrict, getCategories);
 
-router.post('/post-category',  checkTokenStrict, postCategory);
+router.post('/categories',  checkTokenStrict, upload.single('image'), postCategory);
 
 
 

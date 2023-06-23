@@ -3,16 +3,39 @@ import { doQuery } from '../mysql/config';
 import { Request, Response } from 'express';
 import { Option, Product, Variation } from '../interface/product';
 import { User } from '../interface/user';
+import * as cloudinary from 'cloudinary'
 import { Admin } from '../interface/admin';
-import * as uuid from 'uuid';
+import * as fs from 'fs'
 
 export const postCategory = async (req: Request, res: Response) => {
   try {
 
+    const {name, description,image} = req.body
+    const {local_id, admin_table} = (req as any).user
+    const file = req.file
+    let imageUrl = null
 
-    const {category_name, category_image, local_id} = req.body
+    if (file){
+      const imageUpload = await cloudinary.v2.uploader.upload(file.path, {
+        folder: admin_table,
+        public_id: name.replace(' ', '-' ).trim() || name,
+        overwrite: true,
+        quality: 90
+      });
+      
+      imageUrl = imageUpload.secure_url;
 
-    const data = await doQuery(`INSERT INTO categories (category_name, category_image, local_id) VALUES(?,?,?)`, [category_name, category_image, local_id])
+      fs.rm(file.path, ()=> console.log(`rm(${file.path})`))
+      
+      
+    }
+    console.log(file);
+  
+    
+
+    
+
+    const data = await doQuery(`INSERT INTO categories (category_name, category_image, local_id) VALUES(?,?,?)`, [name, imageUrl, local_id])
     
 
     res.send(data).status(200)

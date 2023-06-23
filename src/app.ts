@@ -21,7 +21,7 @@ const app = express()
 app.use(cors())
 app.use(cookieParser())  
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false, }));
 app.use(morgan('dev'))
 
 app.use(router)
