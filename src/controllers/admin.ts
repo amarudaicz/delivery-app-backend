@@ -13,7 +13,7 @@ export const postCategory = async (req: Request, res: Response) => {
     const {name, description,image} = req.body
     const {local_id, admin_table} = (req as any).user
     const file = req.file
-    let imageUrl = null
+    let imageUrl:any = null
 
     if (file){
       const imageUpload = await cloudinary.v2.uploader.upload(file.path, {
