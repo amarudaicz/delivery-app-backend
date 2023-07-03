@@ -1,14 +1,18 @@
 import { Router } from 'express';
-import { deleteOptionGroup, getCategories, postCategory, postOptions, putOptions } from '../controllers/admin';
+import { deleteOptionGroup, getCategories, postCategory, postOptions, putOptions, stateCategory } from '../controllers/admin';
 import { checkTokenStrict } from '../middleware/checkToken';
 import upload from '../config/multer';
 import multer from 'multer';
+import { capitalize } from '../utils/capitalize';
 
 const router = Router();
 
-router.get('/get-categories',checkTokenStrict, getCategories);
 
-router.post('/categories',  checkTokenStrict, upload.single('image'), postCategory);
+//CATEGORIES
+router.get('/get-categories',checkTokenStrict, getCategories);
+router.post('/categories', checkTokenStrict, upload.single('image'), capitalize(true), postCategory);
+
+router.put('/categories/set-active', checkTokenStrict, stateCategory);
 
 
 

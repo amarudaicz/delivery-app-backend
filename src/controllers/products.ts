@@ -21,7 +21,7 @@ export const getProducts = async (req: Request, res: Response) => {
 
     //INTERFACE Product
     let data: any[] = await doQuery(
-      `SELECT ${table}.id, name, price, ingredients, ${table}.local_id, image, category_id, category_name, category_image, variations, description FROM ${table} INNER JOIN categories ON categories.id = ${table}.category_id AND categories.local_id = ${table}.local_id`,
+      `SELECT ${table}.id, name, stock, price, ingredients, ${table}.local_id, image, category_id, category_name, category_image, variations, description FROM ${table} INNER JOIN categories ON categories.id = ${table}.category_id AND categories.local_id = ${table}.local_id`,
       []
     );
 
@@ -63,11 +63,12 @@ export const getProduct = async (req: Request, res: Response) => {
   }
 };
 
+
 export const postProduct = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user as Admin;
     const image = req.file;
-    let imageUrl = null;
+    let imageUrl:any = null;
     
     
     const { name, price, category_id, description, variations, ingredients } = req.body as Product;
@@ -86,7 +87,7 @@ export const postProduct = async (req: Request, res: Response) => {
     
       const data = await doQuery(
         `INSERT INTO ${user.admin_table} (name, local_id, image, price, ingredients, category_id, description, variations) VALUES(?,?,?,?,?,?,?,?)`,
-        [name, user.local_id, imageUrl, price, ingredients, category_id, description === 'null' ? null : description, variations]
+        [name, user.local_id, imageUrl, price, ingredients, category_id, description === 'Null' ? null : description, variations]
       );
     
     return res.json(data);
@@ -120,7 +121,7 @@ export const updateProduct = async (req: Request, res: Response) => {
     const user  = (req as any).user as Admin;
 
     const file = req.file;
-    let imageUrl = null;
+    let imageUrl:any = null;
     
     const {
       id,
@@ -160,3 +161,20 @@ export const updateProduct = async (req: Request, res: Response) => {
     httpError(res, err, 403);
   }
 };
+
+
+
+export const updateStockProduct = async (req:Request, res:Response)=>{
+  try{
+    const user  = (req as any).user as Admin;
+    const {id:idProduct, stock} = req.body
+
+    const data = await doQuery(`UPDATE ${user.admin_table} SET stock = ? WHERE id = ?`, [stock, idProduct])
+
+
+    res.json(data)
+
+  }catch(err){
+
+  }
+}

@@ -4,13 +4,9 @@ import { checkToken } from "../middleware/checkToken";
 const router = Router()
 
 
-
-
 router.post('/', login)
 router.post('/register', checkToken, register)
 router.post('/post-admin', registerAdmin)
-
-
 
 
 

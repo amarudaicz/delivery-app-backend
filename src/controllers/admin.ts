@@ -10,10 +10,13 @@ import * as fs from 'fs'
 export const postCategory = async (req: Request, res: Response) => {
   try {
 
-    const {name, description,image} = req.body
+    const {name, description, image} = req.body
     const {local_id, admin_table} = (req as any).user
+    console.log(req.body);
+    
     const file = req.file
-    let imageUrl:any = null
+
+    let imageUrl:null|string = null
 
     if (file){
       const imageUpload = await cloudinary.v2.uploader.upload(file.path, {
@@ -26,9 +29,8 @@ export const postCategory = async (req: Request, res: Response) => {
       imageUrl = imageUpload.secure_url;
 
       fs.rm(file.path, ()=> console.log(`rm(${file.path})`))
-      
-      
     }
+
     console.log(file);
   
     
@@ -61,6 +63,27 @@ export const getCategories = async (req: Request, res: Response) => {
     httpError(res, err, 202);
   }
 };
+
+
+
+
+export const stateCategory = async (req:Request, res:Response)=>{
+
+  try {
+    
+    const user = (req as any).user
+    const {category_id, state} = (req.body as {category_id:number, state:number})
+
+    const data = await doQuery(`UPDATE categories SET active = ? WHERE id = ?`, [state, category_id])
+
+    res.json(data).status(200)
+
+
+  } catch (err: any) {
+    httpError(res, err);
+  }
+
+}
 
 export const postOptions = async (req: Request, res: Response) => {
   try {
