@@ -7,8 +7,10 @@ import morgan from 'morgan'
 import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 import { cloudConfig } from './config/cloudinary';
+import path from 'path';
 
-dotenv.config()
+const envFilePath = path.resolve(__dirname, '../.env'); 
+dotenv.config({path:envFilePath})
 cloudConfig()
 
  

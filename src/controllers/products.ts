@@ -34,7 +34,6 @@ export const getProducts = async (req: Request, res: Response) => {
     res.json(data);
   } catch (err: any) {
     console.log(err);
-
     httpError(res, 'ERROR_GET_PRODUCTS', 403);
   } 
 };
