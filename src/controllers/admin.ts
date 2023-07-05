@@ -52,7 +52,7 @@ export const postCategory = async (req: Request, res: Response) => {
 export const updateCategory = async (req: Request, res: Response) => {
   try {
 
-    const {name, description, imageSrc} = req.body
+    const {name, description, imageSrc, id} = req.body
     const {local_id, admin_table} = (req as any).user
     console.log(req.body);  
     
@@ -76,7 +76,7 @@ export const updateCategory = async (req: Request, res: Response) => {
     console.log(file);
   
 
-    const data = await doQuery(`INSERT INTO categories (category_name, category_image, local_id) VALUES(?,?,?)`, [name, imageUrl || imageSrc, local_id])
+    const data = await doQuery(`UPDATE categories SET category_name = ?, category_description = ?, category_image = ? WHERE id = ?  VALUES(?,?,?,?)`, [name, description, imageUrl || imageSrc, id])
     
 
     res.send(data).status(200)
