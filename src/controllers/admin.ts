@@ -76,7 +76,7 @@ export const updateCategory = async (req: Request, res: Response) => {
     console.log(file);
   
 
-    const data = await doQuery(`UPDATE categories SET category_name = ?, category_description = ?, category_image = ? WHERE id = ?  VALUES(?,?,?,?)`, [name, description, imageUrl || imageSrc, id])
+    const data = await doQuery(`UPDATE categories SET category_name = ?, category_description = ?, category_image = ? WHERE id = ?`, [name, description, imageUrl || imageSrc, id])
     
 
     res.send(data).status(200)
