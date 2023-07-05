@@ -12,7 +12,7 @@ export const postCategory = async (req: Request, res: Response) => {
 
     const {name, description, image} = req.body
     const {local_id, admin_table} = (req as any).user
-    console.log(req.body);
+    console.log(req.body);  
     
     const file = req.file
 
@@ -47,6 +47,51 @@ export const postCategory = async (req: Request, res: Response) => {
     httpError(res, err, 202);
   }
 };
+
+
+export const updateCategory = async (req: Request, res: Response) => {
+  try {
+
+    const {name, description, imageSrc} = req.body
+    const {local_id, admin_table} = (req as any).user
+    console.log(req.body);  
+    
+    const file = req.file
+
+    let imageUrl:null|string = null
+
+    if (file){
+      const imageUpload = await cloudinary.v2.uploader.upload(file.path, {
+        folder: admin_table,
+        public_id: name.replace(' ', '-' ).trim() || name,
+        overwrite: true,
+        quality: 90
+      });
+      
+      imageUrl = imageUpload.secure_url;
+
+      fs.rm(file.path, ()=> console.log(`rm(${file.path})`))
+    }
+
+    console.log(file);
+  
+    
+
+    
+
+    const data = await doQuery(`INSERT INTO categories (category_name, category_image, local_id) VALUES(?,?,?)`, [name, imageUrl || imageSrc, local_id])
+    
+
+    res.send('data').status(200)
+
+
+  } catch (err: any) {
+    httpError(res, err, 202);
+  }
+};
+
+
+
 
 export const getCategories = async (req: Request, res: Response) => {
   try {
