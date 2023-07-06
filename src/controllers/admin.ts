@@ -16,7 +16,7 @@ export const postCategory = async (req: Request, res: Response) => {
     
     const file = req.file
 
-    let imageUrl:null|string = null
+    let imageUrlCloudinary:null|string = null
 
     if (file){
       const imageUpload = await cloudinary.v2.uploader.upload(file.path, {
@@ -26,7 +26,7 @@ export const postCategory = async (req: Request, res: Response) => {
         quality: 90
       });
       
-      imageUrl = imageUpload.secure_url;
+      imageUrlCloudinary = imageUpload.secure_url;
 
       fs.rm(file.path, ()=> console.log(`rm(${file.path})`))
     }
@@ -37,7 +37,7 @@ export const postCategory = async (req: Request, res: Response) => {
 
     
 
-    const data = await doQuery(`INSERT INTO categories (category_name, category_image, local_id) VALUES(?,?,?)`, [name, imageUrl, local_id])
+    const data = await doQuery(`INSERT INTO categories (category_name, category_image, local_id) VALUES(?,?,?)`, [name, imageUrlCloudinary, local_id])
     
 
     res.send(data).status(200)
@@ -52,13 +52,18 @@ export const postCategory = async (req: Request, res: Response) => {
 export const updateCategory = async (req: Request, res: Response) => {
   try {
 
-    const {name, description, imageSrc, id} = req.body
+    const {name, description, id} = req.body
+    let {imageSrc} = req.body
+    imageSrc = imageSrc  !== 'null' ? imageSrc : null
+    
+    
     const {local_id, admin_table} = (req as any).user
+
     console.log(req.body);  
     
     const file = req.file
-
-    let imageUrl:null|string = null
+    
+    let imageUrlCloudinary:null|string = null
 
     if (file){
       const imageUpload = await cloudinary.v2.uploader.upload(file.path, {
@@ -68,7 +73,7 @@ export const updateCategory = async (req: Request, res: Response) => {
         quality: 90
       });
       
-      imageUrl = imageUpload.secure_url;
+      imageUrlCloudinary = imageUpload.secure_url;
 
       fs.rm(file.path, ()=> console.log(`rm(${file.path})`))
     }
@@ -76,8 +81,8 @@ export const updateCategory = async (req: Request, res: Response) => {
     console.log(file);
   
 
-    const data = await doQuery(`UPDATE categories SET category_name = ?, category_description = ?, category_image = ? WHERE id = ?`, [name, description, imageUrl || imageSrc, id])
-    
+    const data = await doQuery(`UPDATE categories SET category_name = ?, category_description = ?, category_image = ? WHERE id = ?`, [name, description, imageUrlCloudinary || imageSrc, id])
+     
 
     res.send(data).status(200)
 
@@ -86,6 +91,26 @@ export const updateCategory = async (req: Request, res: Response) => {
     httpError(res, err, 202);
   }
 };
+
+export const deleteCategory = async (req:Request, res:Response) => {
+
+  try {
+
+
+    const {id} = req.params
+
+    const data = await doQuery(`DELETE FROM categories WHERE id = ? `, [Number(id)])
+
+    res.send(data)
+    
+  } catch (err) {
+    console.log(err);
+    httpError(res, err as string)
+    
+    
+  }
+
+}
 
 
 
