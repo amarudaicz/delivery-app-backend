@@ -9,9 +9,9 @@ const dbUri = 'mysql://vps3_admin:Contrasenacss3@149.50.129.17:3306/vps3_deli';
   port:Number(process.env.DB_PORT),
   host:process.env.DB_HOST ,
   database:process.env.DB_NAME 
- }); 
+ });  
+   
   
-
 
  
   

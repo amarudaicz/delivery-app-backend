@@ -53,8 +53,8 @@ export const updateCategory = async (req: Request, res: Response) => {
   try {
 
     const {name, description, id} = req.body
-    let {imageSrc} = req.body
-    imageSrc = imageSrc  !== 'null' ? imageSrc : null
+    let {image} = req.body
+    image = image  !== 'null' ? image : null
     
     
     const {local_id, admin_table} = (req as any).user
@@ -81,7 +81,7 @@ export const updateCategory = async (req: Request, res: Response) => {
     console.log(file);
   
 
-    const data = await doQuery(`UPDATE categories SET category_name = ?, category_description = ?, category_image = ? WHERE id = ?`, [name, description, imageUrlCloudinary || imageSrc, id])
+    const data = await doQuery(`UPDATE categories SET category_name = ?, category_description = ?, category_image = ? WHERE id = ?`, [name, description, imageUrlCloudinary || image, id])
      
 
     res.send(data).status(200)

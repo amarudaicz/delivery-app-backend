@@ -6,7 +6,10 @@ import {
   deleteLocal,
   postLocal,
   createTableLocal,
-  getRecents
+  getRecents,
+  putSchedules,
+  putLinks,
+  putLocal
 } from '../controllers/locals';
 import { checkToken, checkTokenStrict } from '../middleware/checkToken';
 
@@ -26,5 +29,8 @@ router.delete('/delete-one/:id', deleteLocal);
 
 router.put('/put-one',checkTokenStrict, updateLocal);
 
+router.put('/put-schedules',checkTokenStrict, putSchedules);
+router.put('/put-links',checkTokenStrict, putLinks);
+router.put('/',checkTokenStrict, putLocal);
 
 export { router };

@@ -2,6 +2,9 @@ import { httpError } from '../utils/httpError';
 import { doQuery } from '../mysql/config';
 import { Request, Response } from 'express';
 import { checkData } from '../utils/checkData';
+import { Admin } from '../interface/admin';
+import { parseJson } from '../utils/parseData';
+import { Local } from '../interface/local';
 
 export const getLocal = async (req: Request, res: Response) => {
 
@@ -10,7 +13,7 @@ export const getLocal = async (req: Request, res: Response) => {
 
     if (!table) return httpError(res, 'No hay tabla para consultar', 403)
 
-    const data = await doQuery('SELECT * FROM locals WHERE name_url = ?;', [
+    const data:Local[] = await doQuery('SELECT * FROM locals WHERE name_url = ?;', [
       table,
     ]);
 
@@ -19,9 +22,11 @@ export const getLocal = async (req: Request, res: Response) => {
       return httpError(res, 'No se a encontrado el local', 202);
     }
 
-    data[0].horarios ? data[0].horarios = JSON.parse(data[0].horarios): null
+    data[0].schedules ? data[0].schedules = JSON.parse(data[0].schedules): null
     data[0].options_group ? data[0].options_group = JSON.parse(data[0].options_group): null
-    console.log({ esto: data });
+    data[0].links = parseJson(data[0].links)
+    data[0].shipping = parseJson(data[0].shipping)
+    data[0].pay_methods = parseJson(data[0].pay_methods)
 
 
     res.json(data);
@@ -70,6 +75,43 @@ export const deleteLocal = async (req: Request, res: Response) => {
   }
 };
 
+
+export const putLocal = async (req: Request, res: Response) => {
+
+  try {
+
+    const user = (req as any).user
+    const updateFields:any = {}
+    
+    const { id, name, location, description, schedules, aliascbu, pick_in_local, delivery_cost, delivery_time, instagram, maps, website, phone, image, options } = req.body;
+    
+    for (const field in req.body){
+      console.log(field);
+
+      if (field !== 'id' && (field === 'options' || field === 'schedules' || field ===  'links' || field ===  'shipping'||field === 'pay_methods'))
+      updateFields[field] = JSON.stringify(req.body[field])
+      else
+      updateFields[field] = req.body[field];
+      
+    }
+    
+    const data = await doQuery(
+      `UPDATE locals SET ?
+      WHERE id = ?;`,
+      [updateFields, user.local_id]
+    );
+    console.log(data);
+    
+
+    res.json(data);
+  } catch (err: any) {
+    console.log(err);
+
+    httpError(res, 'ERROR', 403);
+  }
+};
+
+
 export const updateLocal = async (req: Request, res: Response) => {
 
   try {
@@ -78,7 +120,7 @@ export const updateLocal = async (req: Request, res: Response) => {
     console.log(req.body);
     
 
-    const { id, name, location, description, horarios, aliascbu, pick_in_local, delivery_cost, delivery_time, instagram, maps, website, phone, image, options } = req.body;
+    const { id, name, location, description, schedules, aliascbu, pick_in_local, delivery_cost, delivery_time, instagram, maps, website, phone, image, options } = req.body;
     // const name_url: string = name.trim().toLowerCase().replace(' ', '');
 
     if (options) {
@@ -102,7 +144,7 @@ export const updateLocal = async (req: Request, res: Response) => {
       phone = ?, 
       description = ?, 
       image = ?, 
-      horarios = ?, 
+      schedules = ?, 
       delivery_cost = ?, 
       delivery_time = ?,
       aliascbu = ?,
@@ -111,7 +153,7 @@ export const updateLocal = async (req: Request, res: Response) => {
       maps=?,
       website= ? 
       WHERE id = ?;`,
-      [name, location, phone, description, image, JSON.stringify(horarios), delivery_cost, delivery_time, aliascbu, pick_in_local, instagram, maps, website, user.local_id]
+      [name, location, phone, description, image, JSON.stringify(schedules), delivery_cost, delivery_time, aliascbu, pick_in_local, instagram, maps, website, user.local_id]
     );
 
     res.json(data);
@@ -145,6 +187,52 @@ export const createTableLocal = async (req: Request, res: Response) => {
 };
 
 
+export const putSchedules = async (req: Request, res: Response) => {
+
+  try {
+
+    const { schedules } = req.body
+    const admin = ((req as any).user) as Admin
+
+    const data = await doQuery(
+      `UPDATE locals SET schedules = ? WHERE id = ?`,[JSON.stringify(schedules), admin.local_id]
+    )
+
+    console.log(data);
+    
+    res.send(data)
+
+  } catch (err: any) {
+    console.log(err);
+    
+    httpError(res, err, 403);
+  }
+};
+
+export const putLinks = async (req: Request, res: Response) => {
+
+  try {
+
+    const { links } = req.body
+    const admin = ((req as any).user) as Admin
+
+    const data = await doQuery(
+      `UPDATE locals SET links = ? WHERE id = ?`,[JSON.stringify(links), admin.local_id]
+    )
+
+    console.log(data);
+    
+    res.send(data)
+
+  } catch (err: any) {
+    console.log(err);
+    
+    httpError(res, err, 403);
+  }
+};
+
+
+
 
 export const getRecents = async (req: Request, res: Response) => {
 
@@ -163,7 +251,7 @@ export const getRecents = async (req: Request, res: Response) => {
     
 
     for (let i = 0; i < data.length; i++) {
-      data[i].horarios = JSON.parse(data[i].horarios)
+      data[i].schedules = parseJson(data[i].schedules)
     }
 
 
