@@ -111,7 +111,7 @@ export const sendEmailToResetPassword = async (req: Request, res: Response) => {
         const token = signJwt({id:user[0].id}, '20m')
         console.log({this:token});
         
-        // sendEmail(email, token, resetPasswordTemplate(user[0], token) )
+        sendEmail(email, token, resetPasswordTemplate(user[0], token) )
 
         res.json(true)
     } catch (err) {
