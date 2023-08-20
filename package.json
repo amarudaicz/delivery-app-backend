@@ -2,8 +2,9 @@
   "name": "delivery-app",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/app.js",
-
+  "scripts": {
+    "start": "node dist/app.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
