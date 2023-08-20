@@ -30,5 +30,4 @@ export function checkToken(req: any, res: Response, next: NextFunction) {
     const decoded = verifyJwt(token)
     req.user = decoded; // agregamos el payload decodificado a la solicitud
     next()
-    
 } 

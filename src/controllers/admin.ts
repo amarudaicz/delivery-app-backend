@@ -10,7 +10,7 @@ import * as fs from 'fs'
 export const postCategory = async (req: Request, res: Response) => {
   try {
 
-    const {name, description, image} = req.body
+    const {category_name, category_description, sort_order} = req.body
     const {local_id, admin_table} = (req as any).user
     console.log(req.body);  
     
@@ -21,7 +21,7 @@ export const postCategory = async (req: Request, res: Response) => {
     if (file){
       const imageUpload = await cloudinary.v2.uploader.upload(file.path, {
         folder: admin_table,
-        public_id: name.replace(' ', '-' ).trim() || name,
+        public_id: category_name.replace(' ', '-' ).trim() || category_name,
         overwrite: true,
         quality: 90
       });
@@ -37,7 +37,7 @@ export const postCategory = async (req: Request, res: Response) => {
 
     
 
-    const data = await doQuery(`INSERT INTO categories (category_name, category_image, local_id) VALUES(?,?,?)`, [name, imageUrlCloudinary, local_id])
+    const data = await doQuery(`INSERT INTO categories (category_name, category_image,category_description, sort_order, local_id) VALUES(?,?,?,?,?)`, [category_name, imageUrlCloudinary,category_description, sort_order, local_id])
     
 
     res.send(data).status(200)
@@ -52,7 +52,7 @@ export const postCategory = async (req: Request, res: Response) => {
 export const updateCategory = async (req: Request, res: Response) => {
   try {
 
-    const {name, description, id} = req.body
+    const {category_name, category_description , id, sort_order } = req.body
     let {image} = req.body
     image = image  !== 'null' ? image : null
     
@@ -68,7 +68,7 @@ export const updateCategory = async (req: Request, res: Response) => {
     if (file){
       const imageUpload = await cloudinary.v2.uploader.upload(file.path, {
         folder: admin_table,
-        public_id: name.replace(' ', '-' ).trim() || name,
+        public_id: category_name.replace(' ', '-' ).trim() || name,
         overwrite: true,
         quality: 90
       });
@@ -81,7 +81,7 @@ export const updateCategory = async (req: Request, res: Response) => {
     console.log(file);
   
 
-    const data = await doQuery(`UPDATE categories SET category_name = ?, category_description = ?, category_image = ? WHERE id = ?`, [name, description, imageUrlCloudinary || image, id])
+    const data = await doQuery(`UPDATE categories SET category_name = ?, category_description = ?, category_image = ?  WHERE id = ?`, [category_name, category_description, imageUrlCloudinary || image, Number(id)])
      
 
     res.send(data).status(200)
@@ -147,10 +147,39 @@ export const stateCategory = async (req:Request, res:Response)=>{
 
 
   } catch (err: any) {
+    httpError(res, err); 
+  }
+
+}
+export const putSortOrder = async (req:Request, res:Response)=>{
+
+  try {
+
+    const categories:any[] = req.body.categories 
+
+    console.log(categories);
+    
+    const idsToUpdate = categories.map((categoria) => categoria.id).join(',');
+    let query = `UPDATE categories 
+             SET sort_order = CASE id 
+             ${categories.map((categoria) => `WHEN ${categoria.id} THEN ${categoria.sort_order}`).join(' ')}
+             END
+             WHERE id IN (${idsToUpdate})`;
+             
+    const data = await doQuery(query, [])
+
+    console.log(data);
+    res.send(data)
+    
+  } catch (err: any) {
     httpError(res, err);
   }
 
 }
+
+
+
+
 
 export const postOptions = async (req: Request, res: Response) => {
   try {

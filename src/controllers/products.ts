@@ -2,10 +2,10 @@ import { httpError } from "../utils/httpError";
 import { doQuery } from "../mysql/config";
 import { Request, Response } from "express";
 import { checkData } from "../utils/checkData";
-import { decode } from "jsonwebtoken";
 import { Admin } from "../interface/admin";
 import * as cloudinary from 'cloudinary'
 import { Product } from "../interface/product";
+import {rm} from 'fs'
 
 export const getProducts = async (req: Request, res: Response) => {
   try {
@@ -21,7 +21,7 @@ export const getProducts = async (req: Request, res: Response) => {
 
     //INTERFACE Product
     let data: any[] = await doQuery(
-      `SELECT ${table}.id, name, stock, price, ingredients, ${table}.local_id, image, category_id, category_name, category_image, variations, description FROM ${table} INNER JOIN categories ON categories.id = ${table}.category_id AND categories.local_id = ${table}.local_id`,
+      `SELECT ${table}.id, name, stock, price, ingredients, ${table}.local_id, image, category_id, category_name, category_image, categories.active as category_active, categories.sort_order as category_sort, variations, description FROM ${table} INNER JOIN categories ON categories.id = ${table}.category_id AND categories.local_id = ${table}.local_id`,
       []
     );
 
@@ -82,6 +82,8 @@ export const postProduct = async (req: Request, res: Response) => {
       });
       console.log(imageUpload);
       imageUrl = imageUpload.secure_url;
+      rm(image.path, ()=> console.log('rm->' + image.path))
+      
     }
     
       const data = await doQuery(

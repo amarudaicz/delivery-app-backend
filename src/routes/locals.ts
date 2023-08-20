@@ -13,7 +13,7 @@ import {
 } from '../controllers/locals';
 import { checkToken, checkTokenStrict } from '../middleware/checkToken';
 
-const router = Router();
+export const router = Router();
 
 router.get('/get-all', getAllLocals);
 
@@ -33,4 +33,3 @@ router.put('/put-schedules',checkTokenStrict, putSchedules);
 router.put('/put-links',checkTokenStrict, putLinks);
 router.put('/',checkTokenStrict, putLocal);
 
-export { router };

@@ -21,8 +21,6 @@ const dbUri = 'mysql://vps3_admin:Contrasenacss3@149.50.129.17:3306/vps3_deli';
  
 
 export const poolConnection = () => {
-  console.log(process.env);
-  
   pool.getConnection((err) => {
     if (err) { 
       console.log(err);
