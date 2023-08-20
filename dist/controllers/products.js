@@ -32,11 +32,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateProduct = exports.deleteProduct = exports.postProduct = exports.getProduct = exports.getProducts = void 0;
+exports.updateStockProduct = exports.updateProduct = exports.deleteProduct = exports.postProduct = exports.getProduct = exports.getProducts = void 0;
 const httpError_1 = require("../utils/httpError");
 const config_1 = require("../mysql/config");
 const checkData_1 = require("../utils/checkData");
 const cloudinary = __importStar(require("cloudinary"));
+const fs_1 = require("fs");
 const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
@@ -46,10 +47,10 @@ const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             return (0, httpError_1.httpError)(res, 'No hay tabla para consultar', 403);
         }
         //INTERFACE Product
-        let data = yield (0, config_1.doQuery)(`SELECT ${table}.id, name, price, ingredients, ${table}.local_id, image, category_id, category_name, category_image, variations, description FROM ${table} INNER JOIN categories ON categories.id = ${table}.category_id AND categories.local_id = ${table}.local_id`, []);
+        let data = yield (0, config_1.doQuery)(`SELECT ${table}.id, name, stock, price, ingredients, ${table}.local_id, image, category_id, category_name, category_image, categories.active as category_active, categories.sort_order as category_sort, variations, description FROM ${table} INNER JOIN categories ON categories.id = ${table}.category_id AND categories.local_id = ${table}.local_id`, []);
         for (let i = 0; i < data.length; i++) {
-            data[i].variations = JSON.parse(data[i].variations);
-            data[i].ingredients = JSON.parse(data[i].ingredients);
+            data[i].variations ? data[i].variations = JSON.parse(data[i].variations) : null;
+            data[i].ingredients ? data[i].ingredients = JSON.parse(data[i].ingredients) : null;
         }
         res.json(data);
     }
@@ -90,8 +91,9 @@ const postProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             });
             console.log(imageUpload);
             imageUrl = imageUpload.secure_url;
+            (0, fs_1.rm)(image.path, () => console.log('rm->' + image.path));
         }
-        const data = yield (0, config_1.doQuery)(`INSERT INTO ${user.admin_table} (name, local_id, image, price, ingredients, category_id, description, variations) VALUES(?,?,?,?,?,?,?,?)`, [name, user.local_id, imageUrl, price, ingredients, category_id, description === 'null' ? null : description, variations]);
+        const data = yield (0, config_1.doQuery)(`INSERT INTO ${user.admin_table} (name, local_id, image, price, ingredients, category_id, description, variations) VALUES(?,?,?,?,?,?,?,?)`, [name, user.local_id, imageUrl, price, ingredients, category_id, description === 'Null' ? null : description, variations]);
         return res.json(data);
     }
     catch (err) {
@@ -104,10 +106,12 @@ const deleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const { id } = req.params;
         const { admin_table } = req.user;
-        const data = yield (0, config_1.doQuery)(`DELETE FROM ${admin_table} WHERE id = ?;`, [id]);
+        console.log(id);
+        const data = yield (0, config_1.doQuery)(`DELETE FROM ${admin_table} WHERE id = ?;`, [Number(id)]);
         res.json(data);
     }
     catch (err) {
+        console.log(err);
         (0, httpError_1.httpError)(res, err, 403);
     }
 });
@@ -117,7 +121,7 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const user = req.user;
         const file = req.file;
         let imageUrl = null;
-        const { id, name, price, category_id, description, variations, ingredients, image } = req.body;
+        const { id, name, price, description, variations, ingredients, image } = req.body;
         console.log(req.body);
         if (file) {
             const imageUpload = yield cloudinary.v2.uploader.upload(file.path, {
@@ -129,7 +133,7 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             console.log(imageUpload);
             imageUrl = imageUpload.secure_url;
         }
-        const data = yield (0, config_1.doQuery)(`UPDATE ${user.admin_table} SET name=?, image=?, price=?, ingredients=?, category_id=?, description=?, variations=? WHERE id = ? `, [name, imageUrl ? imageUrl : (image === 'null' ? null : image), price, ingredients, category_id, description === 'null' ? null : description, variations, id]);
+        const data = yield (0, config_1.doQuery)(`UPDATE ${user.admin_table} SET name=?, image=?, price=?, ingredients=?, description=?, variations=? WHERE id = ? `, [name, imageUrl ? imageUrl : (image === 'null' ? null : image), price, ingredients, description === 'null' ? null : description, variations, id]);
         res.json(data);
     }
     catch (err) {
@@ -138,3 +142,14 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.updateProduct = updateProduct;
+const updateStockProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = req.user;
+        const { id: idProduct, stock } = req.body;
+        const data = yield (0, config_1.doQuery)(`UPDATE ${user.admin_table} SET stock = ? WHERE id = ?`, [stock, idProduct]);
+        res.json(data);
+    }
+    catch (err) {
+    }
+});
+exports.updateStockProduct = updateStockProduct;

@@ -9,10 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getRecents = exports.createTableLocal = exports.updateLocal = exports.deleteLocal = exports.postLocal = exports.getAllLocals = exports.getLocal = void 0;
+exports.getRecents = exports.putLinks = exports.putSchedules = exports.createTableLocal = exports.updateLocal = exports.putLocal = exports.deleteLocal = exports.postLocal = exports.getAllLocals = exports.getLocal = void 0;
 const httpError_1 = require("../utils/httpError");
 const config_1 = require("../mysql/config");
 const checkData_1 = require("../utils/checkData");
+const parseData_1 = require("../utils/parseData");
 const getLocal = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
@@ -25,9 +26,11 @@ const getLocal = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if ((0, checkData_1.checkData)(data)) {
             return (0, httpError_1.httpError)(res, 'No se a encontrado el local', 202);
         }
-        data[0].horarios = JSON.parse(data[0].horarios);
-        data[0].options_group = JSON.parse(data[0].options_group);
-        console.log({ esto: data });
+        data[0].schedules ? data[0].schedules = JSON.parse(data[0].schedules) : null;
+        data[0].options_group ? data[0].options_group = JSON.parse(data[0].options_group) : null;
+        data[0].links = (0, parseData_1.parseJson)(data[0].links);
+        data[0].shipping = (0, parseData_1.parseJson)(data[0].shipping);
+        data[0].pay_methods = (0, parseData_1.parseJson)(data[0].pay_methods);
         res.json(data);
     }
     catch (err) {
@@ -69,11 +72,34 @@ const deleteLocal = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.deleteLocal = deleteLocal;
+const putLocal = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = req.user;
+        const updateFields = {};
+        const { id, name, location, description, schedules, aliascbu, pick_in_local, delivery_cost, delivery_time, instagram, maps, website, phone, image, options } = req.body;
+        for (const field in req.body) {
+            console.log(field);
+            if (field !== 'id' && (field === 'options' || field === 'schedules' || field === 'links' || field === 'shipping' || field === 'pay_methods'))
+                updateFields[field] = JSON.stringify(req.body[field]);
+            else
+                updateFields[field] = req.body[field];
+        }
+        const data = yield (0, config_1.doQuery)(`UPDATE locals SET ?
+      WHERE id = ?;`, [updateFields, user.local_id]);
+        console.log(data);
+        res.json(data);
+    }
+    catch (err) {
+        console.log(err);
+        (0, httpError_1.httpError)(res, 'ERROR', 403);
+    }
+});
+exports.putLocal = putLocal;
 const updateLocal = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = req.user;
         console.log(req.body);
-        const { id, name, location, description, horarios, aliascbu, pick_in_local, delivery_cost, delivery_time, instagram, maps, website, phone, image, options } = req.body;
+        const { id, name, location, description, schedules, aliascbu, pick_in_local, delivery_cost, delivery_time, instagram, maps, website, phone, image, options } = req.body;
         // const name_url: string = name.trim().toLowerCase().replace(' ', '');
         if (options) {
             const data = yield (0, config_1.doQuery)(`UPDATE locals SET 
@@ -89,7 +115,7 @@ const updateLocal = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
       phone = ?, 
       description = ?, 
       image = ?, 
-      horarios = ?, 
+      schedules = ?, 
       delivery_cost = ?, 
       delivery_time = ?,
       aliascbu = ?,
@@ -97,7 +123,7 @@ const updateLocal = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
       instagram = ?, 
       maps=?,
       website= ? 
-      WHERE id = ?;`, [name, location, phone, description, image, JSON.stringify(horarios), delivery_cost, delivery_time, aliascbu, pick_in_local, instagram, maps, website, user.local_id]);
+      WHERE id = ?;`, [name, location, phone, description, image, JSON.stringify(schedules), delivery_cost, delivery_time, aliascbu, pick_in_local, instagram, maps, website, user.local_id]);
         res.json(data);
     }
     catch (err) {
@@ -118,6 +144,34 @@ const createTableLocal = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.createTableLocal = createTableLocal;
+const putSchedules = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { schedules } = req.body;
+        const admin = (req.user);
+        const data = yield (0, config_1.doQuery)(`UPDATE locals SET schedules = ? WHERE id = ?`, [JSON.stringify(schedules), admin.local_id]);
+        console.log(data);
+        res.send(data);
+    }
+    catch (err) {
+        console.log(err);
+        (0, httpError_1.httpError)(res, err, 403);
+    }
+});
+exports.putSchedules = putSchedules;
+const putLinks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { links } = req.body;
+        const admin = (req.user);
+        const data = yield (0, config_1.doQuery)(`UPDATE locals SET links = ? WHERE id = ?`, [JSON.stringify(links), admin.local_id]);
+        console.log(data);
+        res.send(data);
+    }
+    catch (err) {
+        console.log(err);
+        (0, httpError_1.httpError)(res, err, 403);
+    }
+});
+exports.putLinks = putLinks;
 const getRecents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { recents } = req.body;
@@ -126,7 +180,7 @@ const getRecents = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
       WHERE id IN (${recents.join(', ')})`, []);
         console.log(data);
         for (let i = 0; i < data.length; i++) {
-            data[i].horarios = JSON.parse(data[i].horarios);
+            data[i].schedules = (0, parseData_1.parseJson)(data[i].schedules);
         }
         res.send(data);
     }

@@ -32,13 +32,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.registerAdmin = exports.register = exports.login = void 0;
+exports.resetPassword = exports.verifyToken = exports.sendEmailToResetPassword = exports.registerAdmin = exports.register = exports.login = void 0;
 const bcrypt = __importStar(require("bcrypt"));
 const config_1 = require("../mysql/config");
 const httpError_1 = require("../utils/httpError");
 const cleanUser_1 = require("../utils/cleanUser");
 const handleJwt_1 = require("../utils/handleJwt");
 const checkData_1 = require("../utils/checkData");
+const formatExpJwt_1 = require("../utils/formatExpJwt");
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { username, password } = req.body;
@@ -67,7 +68,6 @@ exports.login = login;
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = req.user;
-        console.log(user);
         if (!user.root) {
             return (0, httpError_1.httpError)(res, 'No tienes permisos', 403);
         }
@@ -93,7 +93,6 @@ const registerAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const salt = yield bcrypt.genSalt(15);
         data.password = yield bcrypt.hash(data.password, salt);
         const operation = yield (0, config_1.doQuery)(`INSERT INTO users (username, password, admin_table, local_id) VALUES (?,?,?,?)`, [data.username, data.password, data.admin_table, data.local_id]);
-        console.log(operation);
         res.status(201).json(operation);
     }
     catch (err) {
@@ -102,3 +101,65 @@ const registerAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.registerAdmin = registerAdmin;
+const sendEmailToResetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        //HACER TOKEN Y TODA LA BOLA 
+        const { email } = req.body;
+        const user = yield (0, config_1.doQuery)(`select * from users WHERE email = ?`, [email]);
+        if (!user[0]) {
+            return (0, httpError_1.httpError)(res, 'El correo ingresado no esta registrado', 401);
+        }
+        const token = (0, handleJwt_1.signJwt)({ id: user[0].id }, '20m');
+        console.log({ this: token });
+        // sendEmail(email, token, resetPasswordTemplate(user[0], token) )
+        res.json(true);
+    }
+    catch (err) {
+        console.log(err);
+        (0, httpError_1.httpError)(res, 'ERROR_RECOVERY_PASSWORD', 403);
+    }
+});
+exports.sendEmailToResetPassword = sendEmailToResetPassword;
+const verifyToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const token = req.query.token;
+        const isValid = (0, handleJwt_1.verifyJwt)(token);
+        console.log((0, formatExpJwt_1.formatExpiration)(isValid === null || isValid === void 0 ? void 0 : isValid.exp));
+        if (!isValid) {
+            (0, httpError_1.httpError)(res, 'El link no es valido o expiró porfavor repita el proceso');
+            return;
+        }
+        res.json(true);
+    }
+    catch (err) {
+        console.log(err);
+        (0, httpError_1.httpError)(res, 'ERROR_EN_VERIFY_TOKEN', 403);
+    }
+});
+exports.verifyToken = verifyToken;
+const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let password = req.body.password;
+        const token = req.headers.authorization.split(' ')[1];
+        if (!token) {
+            (0, httpError_1.httpError)(res, 'A ocurrido un error porfavor repita el proceso');
+            return;
+        }
+        const userId = (0, handleJwt_1.verifyJwt)(token).id;
+        if (!userId) {
+            (0, httpError_1.httpError)(res, 'El enlace no es valido o expiró porfavor repita el proceso');
+            return;
+        }
+        console.log(userId);
+        const salt = yield bcrypt.genSalt(15);
+        password = yield bcrypt.hash(password, salt);
+        const op = yield (0, config_1.doQuery)(`UPDATE users SET password = ? WHERE id = ?;`, [password, userId]);
+        console.log(op);
+        res.json(true);
+    }
+    catch (err) {
+        console.log(err);
+        (0, httpError_1.httpError)(res, 'ERROR_EN_VERIFY_TOKEN', 403);
+    }
+});
+exports.resetPassword = resetPassword;

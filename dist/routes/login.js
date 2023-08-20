@@ -9,3 +9,6 @@ exports.router = router;
 router.post('/', login_1.login);
 router.post('/register', checkToken_1.checkToken, login_1.register);
 router.post('/post-admin', login_1.registerAdmin);
+router.post('/send_reset_password', login_1.sendEmailToResetPassword);
+router.get('/verify_token', login_1.verifyToken);
+router.post('/reset_password', login_1.resetPassword);

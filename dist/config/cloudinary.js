@@ -13,6 +13,6 @@ function cloudConfig() {
         api_secret: process.env.SECRET_CLOUDINARY
     };
     cloudinary_1.default.v2.config(config);
-    console.log('Cloud-In-Line');
+    console.log('cloudinary-online');
 }
 exports.cloudConfig = cloudConfig;
