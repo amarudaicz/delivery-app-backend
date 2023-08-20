@@ -17,7 +17,7 @@ const path_1 = __importDefault(require("path"));
 const envFilePath = path_1.default.resolve(__dirname, '../.env');
 dotenv_1.default.config({ path: envFilePath });
 (0, cloudinary_1.cloudConfig)();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT ?? 8080;
 exports.app = (0, express_1.default)();
 exports.app.use((0, cors_1.default)());
 exports.app.use((0, cookie_parser_1.default)());
