@@ -25,7 +25,8 @@ export const getProducts = async (req: Request, res: Response) => {
       []
     );
 
- 
+    console.log(data);
+    
     for (let i = 0; i < data.length; i++) {
       data[i].variations ? data[i].variations = JSON.parse(data[i].variations) : null
       data[i].ingredients ? data[i].ingredients = JSON.parse(data[i].ingredients) : null

@@ -240,6 +240,12 @@ export const getRecents = async (req: Request, res: Response) => {
 
     const { recents } = req.body
 
+    if (checkData(recents)) {
+      res.json([])
+      return
+    }
+
+ 
     const data = await doQuery(
       `SELECT *
       FROM locals
@@ -255,7 +261,7 @@ export const getRecents = async (req: Request, res: Response) => {
     }
 
 
-    res.send(data)
+    res.json(data)
 
   } catch (err: any) {
     console.log(err);

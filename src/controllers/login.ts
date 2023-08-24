@@ -21,6 +21,8 @@ export const login = async (req: Request, res: Response) => {
             return httpError(res, 'No existe un usuario registrado', 401)
         }
 
+        console.log(password);
+        
         const checkPassword = await bcrypt.compare(password, user[0].password)
 
 
@@ -104,6 +106,8 @@ export const sendEmailToResetPassword = async (req: Request, res: Response) => {
 
         const user:Admin[] = await doQuery(`select * from users WHERE email = ?`, [email])
 
+        console.log(user);
+        
         if (!user[0]) {
             return httpError(res, 'El correo ingresado no esta registrado', 401)
         }
