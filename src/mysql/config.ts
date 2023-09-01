@@ -1,6 +1,6 @@
 import mysql2 from "mysql2";
 
-const dbUri = 'mysql://vps3_admin:Contrasenacss3@149.50.129.17:3306/vps3_deli';
+console.log(process.env);
 
  const pool = mysql2.createPool({
   connectionLimit: 10,
@@ -12,7 +12,6 @@ const dbUri = 'mysql://vps3_admin:Contrasenacss3@149.50.129.17:3306/vps3_deli';
  });  
    
   
-
  
   
 // CREATE USER 'vps3_admin'@'190.220.19.48' IDENTIFIED BY '12345678';
