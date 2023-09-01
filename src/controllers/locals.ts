@@ -94,12 +94,16 @@ export const putLocal = async (req: Request, res: Response) => {
       updateFields[field] = req.body[field];
       
     }
+
+    console.log(updateFields);
+    
     
     const data = await doQuery(
       `UPDATE locals SET ?
       WHERE id = ?;`,
       [updateFields, user.local_id]
     );
+    
     console.log(data);
     
 

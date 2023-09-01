@@ -221,7 +221,7 @@ export const putOptions = async (req: Request, res: Response) => {
 
     if (!products.length) {
       res.send(updateLocalOptions)
-      return
+      return 
     }
 
     const productsRecovery:Product[] | any[] = await doQuery(`SELECT * FROM ${user.admin_table} WHERE id IN (${ products.join(',') })`, [user.local_id])
