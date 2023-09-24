@@ -25,7 +25,6 @@ export const getProducts = async (req: Request, res: Response) => {
       []
     );
 
-    console.log(data);
     
     for (let i = 0; i < data.length; i++) {
       data[i].variations ? data[i].variations = JSON.parse(data[i].variations) : null
@@ -45,7 +44,7 @@ export const getProduct = async (req: Request, res: Response) => {
     const { admin_table } = (req as any).user
 
 
-    const data = await doQuery(
+    const data:any[] = await doQuery(
       `SELECT ${local}.id, name, price, ingredients, category_id, category_name FROM ${local} INNER JOIN categories ON categories.id = ${local}.category_id AND categories.local_id = ${local}.local_id WHERE ${local}.id = ${Number(
         id
       )} `,
@@ -73,7 +72,6 @@ export const postProduct = async (req: Request, res: Response) => {
     
     const { name, price, category_id, description, variations, ingredients } = req.body as Product;
     
-    console.log(req.body, ingredients);
     if (image) {
       const imageUpload = await cloudinary.v2.uploader.upload(image.path, { 
         folder: user.admin_table,
@@ -135,7 +133,6 @@ export const updateProduct = async (req: Request, res: Response) => {
       image
     } = req.body;
 
-    console.log(req.body);
     
 
     if (file) {
@@ -146,7 +143,6 @@ export const updateProduct = async (req: Request, res: Response) => {
         quality: 90
       });
       
-      console.log(imageUpload);
       imageUrl = imageUpload.secure_url;
     }
     

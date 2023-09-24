@@ -1,6 +1,5 @@
 import mysql2 from "mysql2";
 
-console.log(process.env);
 
  const pool = mysql2.createPool({
   connectionLimit: 10,
@@ -29,8 +28,8 @@ export const poolConnection = () => {
   }); 
 }; 
 
-export const doQuery = (query: string, data: any) => {
-  return new Promise<any>((resolve, reject) => {
+export const doQuery = <T>(query: string, data: any) => {
+  return new Promise<T>((resolve, reject) => {
     const formatQuery = mysql2.format(query, data);
 
      pool.query<any>(formatQuery, (error, results, fields) => {

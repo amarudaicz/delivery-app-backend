@@ -20,9 +20,6 @@ export const postView = async (req: Request, res: Response) => {
     `INSERT INTO stats (local_id, date) VALUES (?, ?)`,
     [local_id, date]
   );
-  console.log(data);
-
-  console.log(date);
   res.send(data);
 };
 

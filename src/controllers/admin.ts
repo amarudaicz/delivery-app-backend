@@ -12,7 +12,6 @@ export const postCategory = async (req: Request, res: Response) => {
 
     const {category_name, category_description, sort_order} = req.body
     const {local_id, admin_table} = (req as any).user
-    console.log(req.body);  
     
     const file = req.file
 
@@ -31,7 +30,6 @@ export const postCategory = async (req: Request, res: Response) => {
       fs.rm(file.path, ()=> console.log(`rm(${file.path})`))
     }
 
-    console.log(file);
   
     
 
@@ -58,8 +56,6 @@ export const updateCategory = async (req: Request, res: Response) => {
     
     
     const {local_id, admin_table} = (req as any).user
-
-    console.log(req.body);  
     
     const file = req.file
     
@@ -78,8 +74,6 @@ export const updateCategory = async (req: Request, res: Response) => {
       fs.rm(file.path, ()=> console.log(`rm(${file.path})`))
     }
 
-    console.log(file);
-  
 
     const data = await doQuery(`UPDATE categories SET category_name = ?, category_description = ?, category_image = ?  WHERE id = ?`, [category_name, category_description, imageUrlCloudinary || image, Number(id)])
      
@@ -118,8 +112,6 @@ export const deleteCategory = async (req:Request, res:Response) => {
 export const getCategories = async (req: Request, res: Response) => {
   try {
 
-    console.log((req as any).user);
-    
     const {local_id} = (req as any).user
 
     const data = await doQuery(`SELECT * FROM categories WHERE local_id = ? `, [local_id])
@@ -157,8 +149,6 @@ export const putSortOrder = async (req:Request, res:Response)=>{
 
     const categories:any[] = req.body.categories 
 
-    console.log(categories);
-    
     const idsToUpdate = categories.map((categoria) => categoria.id).join(',');
     let query = `UPDATE categories 
              SET sort_order = CASE id 
@@ -168,7 +158,6 @@ export const putSortOrder = async (req:Request, res:Response)=>{
              
     const data = await doQuery(query, [])
 
-    console.log(data);
     res.send(data)
     
   } catch (err: any) {
@@ -186,7 +175,6 @@ export const postOptions = async (req: Request, res: Response) => {
     
     const {local_id} = (req as any).user
     const {options} = req.body
-    console.log(options);
     
 
     if (!options) {
@@ -245,7 +233,6 @@ export const putOptions = async (req: Request, res: Response) => {
     `;
 
     const data = await doQuery(updateQuery, []);
-    console.log(data);
     
 
     res.send(data).status(200)
@@ -259,15 +246,12 @@ export const putOptions = async (req: Request, res: Response) => {
 export const deleteOptionGroup = async (req: Request, res: Response) => {
   try {
 
-    console.log((req as any).user);
     
     const {local_id} = (req as any).user
     const {id:idGroup} = req.params
 
-    console.log(idGroup);
     
-    let dataSet = await doQuery(`SELECT options_group FROM locals WHERE id = ?`, [local_id])
-    console.log({esto:dataSet});
+    let dataSet:any[] = await doQuery(`SELECT options_group FROM locals WHERE id = ?`, [local_id])
     dataSet = JSON.parse(dataSet[0].options_group)
     dataSet = dataSet.filter((e:Variation)=> e.id !== Number(idGroup))
     

@@ -19,7 +19,7 @@ export const getLocal = async (req: Request, res: Response) => {
 
 
     if (checkData(data)) {
-      return httpError(res, 'No se a encontrado el local', 202);
+      return httpError(res, 'No se a encontrado el local', 403);
     }
 
     data[0].schedules ? data[0].schedules = JSON.parse(data[0].schedules): null
@@ -86,16 +86,14 @@ export const putLocal = async (req: Request, res: Response) => {
     const { id, name, location, description, schedules, aliascbu, pick_in_local, delivery_cost, delivery_time, instagram, maps, website, phone, image, options } = req.body;
     
     for (const field in req.body){
-      console.log(field);
 
       if (field !== 'id' && (field === 'options' || field === 'schedules' || field ===  'links' || field ===  'shipping'||field === 'pay_methods'))
       updateFields[field] = JSON.stringify(req.body[field])
-      else
+      else  
       updateFields[field] = req.body[field];
       
     }
 
-    console.log(updateFields);
     
     
     const data = await doQuery(
@@ -104,7 +102,6 @@ export const putLocal = async (req: Request, res: Response) => {
       [updateFields, user.local_id]
     );
     
-    console.log(data);
     
 
     res.json(data);
@@ -121,7 +118,6 @@ export const updateLocal = async (req: Request, res: Response) => {
   try {
 
     const user = (req as any).user
-    console.log(req.body);
     
 
     const { id, name, location, description, schedules, aliascbu, pick_in_local, delivery_cost, delivery_time, instagram, maps, website, phone, image, options } = req.body;
@@ -202,7 +198,6 @@ export const putSchedules = async (req: Request, res: Response) => {
       `UPDATE locals SET schedules = ? WHERE id = ?`,[JSON.stringify(schedules), admin.local_id]
     )
 
-    console.log(data);
     
     res.send(data)
 
@@ -224,7 +219,6 @@ export const putLinks = async (req: Request, res: Response) => {
       `UPDATE locals SET links = ? WHERE id = ?`,[JSON.stringify(links), admin.local_id]
     )
 
-    console.log(data);
     
     res.send(data)
 
@@ -250,22 +244,21 @@ export const getRecents = async (req: Request, res: Response) => {
     }
 
  
-    const data = await doQuery(
+    const data:Local[] = await doQuery(
       `SELECT *
       FROM locals
       WHERE id IN (${recents.join(', ')})`,
       []
     )
-
-    console.log(data);
     
-
     for (let i = 0; i < data.length; i++) {
       data[i].schedules = parseJson(data[i].schedules)
+      data[i].pay_methods = parseJson(data[i].pay_methods)
+      data[i].shipping = parseJson(data[i].shipping)
     }
 
-
-    res.json(data)
+ 
+    res.json(data) 
 
   } catch (err: any) {
     console.log(err);

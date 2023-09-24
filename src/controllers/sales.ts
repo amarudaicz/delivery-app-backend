@@ -21,9 +21,6 @@ export const postSale = async (req: Request, res: Response) => {
       `INSERT INTO sales (local_id, date, ammount) VALUES (?, ?, ?)`,
       [local_id, date, ammount]
     );
-    console.log(data);
-
-    console.log(date);
 
     res.send("ok");
   } catch (error: any) {
@@ -34,8 +31,8 @@ export const postSale = async (req: Request, res: Response) => {
 export const getSales = async (req: Request , res: Response) => {
   try {
     const { local_id } = (req as any).user;
-
     console.log((req as any).user);
+    
     
     // Query to get visits grouped by date
     const query = `
@@ -46,8 +43,6 @@ export const getSales = async (req: Request , res: Response) => {
 
     const sales: Sale[] = await doQuery(query, [local_id]);
 
-    console.log(sales);
-    
     if (!sales.length) {      
       res.send('No se registraron ventas')
       return

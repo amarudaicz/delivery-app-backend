@@ -12,6 +12,7 @@ import {
   putLocal
 } from '../controllers/locals';
 import { checkToken, checkTokenStrict } from '../middleware/checkToken';
+import { checkUserState } from '../middleware/checkUserState';
 
 export const router = Router();
 
@@ -27,9 +28,9 @@ router.post('/post-table', createTableLocal);
 
 router.delete('/delete-one/:id', deleteLocal);
 
-router.put('/put-one',checkTokenStrict, updateLocal);
+router.put('/put-one',checkTokenStrict, checkUserState, updateLocal);
 
-router.put('/put-schedules',checkTokenStrict, putSchedules);
-router.put('/put-links',checkTokenStrict, putLinks);
-router.put('/',checkTokenStrict, putLocal);
+router.put('/put-schedules',checkTokenStrict, checkUserState, putSchedules);
+router.put('/put-links',checkTokenStrict, checkUserState, putLinks);
+router.put('/',checkTokenStrict, checkUserState, putLocal);
 

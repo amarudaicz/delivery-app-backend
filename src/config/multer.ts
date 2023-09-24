@@ -1,19 +1,15 @@
 import multer, { Multer } from 'multer';
 import path from 'path';
 
-
-
+// Configurar Multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    console.log(path.dirname);
-    cb(null,  path.join(__dirname, '../../uploads/'));
+    cb(null, 'uploads/'); // Directorio donde se guardarán los archivos
   },
   filename: function (req, file, cb) {
-    console.log(file);
-    cb(null, file.originalname);
+    cb(null, Date.now() + '-' + file.originalname); // Nombre del archivo
   }
-
 });
 
-const upload: Multer = multer({ storage:storage });
+const upload = multer({ storage: storage });
 export default upload;

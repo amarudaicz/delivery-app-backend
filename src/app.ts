@@ -8,6 +8,8 @@ import cookieParser from 'cookie-parser'
 import { cloudConfig } from './config/cloudinary';
 import { router } from './routes';
 import path from 'path';
+import './tasks/cronTasks'
+import './config/mercadopago'
 
 const envFilePath = path.resolve(__dirname, '../.env'); 
 dotenv.config({path:envFilePath})
@@ -15,7 +17,6 @@ cloudConfig()
 
 const PORT = process.env.PORT || 3001
 export const app = express()
-
 
 app.use(cors()) 
 app.use(cookieParser())  

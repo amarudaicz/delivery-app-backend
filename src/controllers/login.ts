@@ -4,39 +4,42 @@ import { doQuery } from "../mysql/config";
 import { httpError } from "../utils/httpError";
 import { Admin } from "../interface/admin";
 import { cleanUser } from "../utils/cleanUser";
-import { signJwt, verifyJwt } from "../utils/handleJwt";
+import { getPayload, signJwt, verifyJwt } from "../utils/handleJwt";
 import { checkData } from "../utils/checkData";
 import { sendEmail } from "../config/nodemailer";
 import { resetPasswordTemplate } from "../templates/resetPasswordEmail";
 import { formatExpiration } from "../utils/formatExpJwt";
 import { JwtPayload } from "jsonwebtoken";
+import { UserModel } from "../models/user";
+import { User } from "../interface/user";
+import { Local } from "../interface/local";
+import { LocalModel } from "../models/local";
 
 
 export const login = async (req: Request, res: Response) => {
     try {
         const { username, password } = req.body
-        let user = await doQuery(`select * from users WHERE username = ?`, [username])
-
-        if (checkData(user)) {
+        // let user = await doQuery<any>(`select * from users WHERE username = ?`, [username])
+        const user = (await UserModel.getUser(username))[0]
+        
+        if (!user) {
             return httpError(res, 'No existe un usuario registrado', 401)
         }
 
-        console.log(password);
+        // if (!user.active || !user.subscription_status) {
+        //     return httpError(res, 'Tu cuenta se encuentra inactiva por falta de pago, porfavor ponte en contacto con nostros', 402)
+        // }
         
-        const checkPassword = await bcrypt.compare(password, user[0].password)
-
+        const checkPassword = await bcrypt.compare(password, user.password)
 
         if (!checkPassword) {
             return httpError(res, 'Contraseña incorrecta', 401)
         }
 
-        if (!user[0].admin) {
-            user = cleanUser(user[0]) 
-        }
-
-
-        delete user[0].password
-        const token = signJwt(user[0])
+        const payload = getPayload(user)
+        console.log(payload);
+        
+        const token = signJwt(payload)
         const exp = (verifyJwt(token) as JwtPayload).exp
         
         res.cookie('jwt', token, {httpOnly:true, secure:true}).json({token, exp})
@@ -49,24 +52,19 @@ export const login = async (req: Request, res: Response) => {
 
 }
 
-export const register = async (req: Request, res: Response) => {
-
+export const register = async (req: Request|any, res: Response) => {
     try {
-        const user:Admin = (req as any).user
-        
-        if (!user.root) {
-            return httpError(res, 'No tienes permisos', 403)
-        }
-        
-        let { username, password, admin, admin_table, local_id } = req.body
+
+        let { user, local }:{user:User, local:Local} = req.body
+
+        const opLocal = await LocalModel.postLocal(local)
 
         const salt = await bcrypt.genSalt(15)
-        password = await bcrypt.hash(password, salt)
+        user.password = await bcrypt.hash(user.password, salt)
 
-        const op = await doQuery(`
-        INSERT IGNORE INTO users (username, password, admin_table, local_id, admin)
-        VALUES (?,?,?,?,?);`,
-        [username, password, admin_table, local_id, admin || 0])
+        const op:any = await doQuery(`INSERT INTO users ?`, [user])
+        console.log(op);
+        
 
         if (!op.affectedRows) return httpError(res, 'Nombre de usuario en uso', 403)
 
@@ -113,7 +111,6 @@ export const sendEmailToResetPassword = async (req: Request, res: Response) => {
         }
 
         const token = signJwt({id:user[0].id}, '20m')
-        console.log({this:token});
         
         sendEmail(email, token, resetPasswordTemplate(user[0], token) )
 
@@ -134,8 +131,6 @@ export const verifyToken = async (req: Request, res: Response) => {
         
         const isValid:any = verifyJwt(token)
         
-        console.log(formatExpiration(isValid?.exp));
-
         if (!isValid) {
             httpError(res, 'El link no es valido o expiró porfavor repita el proceso')
             return 
@@ -168,7 +163,6 @@ export const resetPassword = async (req: Request, res: Response) => {
             return
         }
 
-        console.log(userId);
         const salt = await bcrypt.genSalt(15)
         password = await bcrypt.hash(password, salt)
         
