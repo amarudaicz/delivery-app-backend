@@ -13,7 +13,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { UserModel } from "../models/user";
 import { User } from "../interface/user";
 import { Local } from "../interface/local";
-import { LocalModel } from "../models/local";
+import { LocalModel } from "../models/local-model";
 
 
 export const login = async (req: Request, res: Response) => {
@@ -52,12 +52,12 @@ export const login = async (req: Request, res: Response) => {
 
 }
 
+
 export const register = async (req: Request|any, res: Response) => {
+
     try {
 
         let { user, local }:{user:User, local:Local} = req.body
-
-        const opLocal = await LocalModel.postLocal(local)
 
         const salt = await bcrypt.genSalt(15)
         user.password = await bcrypt.hash(user.password, salt)
@@ -65,7 +65,6 @@ export const register = async (req: Request|any, res: Response) => {
         const op:any = await doQuery(`INSERT INTO users ?`, [user])
         console.log(op);
         
-
         if (!op.affectedRows) return httpError(res, 'Nombre de usuario en uso', 403)
 
         res.status(201).json({ success: 'Usuario creado' })
@@ -77,24 +76,6 @@ export const register = async (req: Request|any, res: Response) => {
 }
 
 
-export const registerAdmin = async (req: Request, res: Response) => {
-
-    try {
-        const data = req.body as Admin
-
-        const salt = await bcrypt.genSalt(15)
-        data.password = await bcrypt.hash(data.password, salt)
-        const operation = await doQuery(`INSERT INTO users (username, password, admin_table, local_id) VALUES (?,?,?,?)`, [data.username, data.password, data.admin_table, data.local_id])
-
-        res.status(201).json(operation)
-
-    } catch (err) {
-        console.log(err);
-        httpError(res, 'ERROR_REGISTER_ADMIN', 403)
-
-    }
-
-}
 
 export const sendEmailToResetPassword = async (req: Request, res: Response) => {
 

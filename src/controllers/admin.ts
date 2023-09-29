@@ -4,8 +4,10 @@ import { Request, Response } from 'express';
 import { Option, Product, Variation } from '../interface/product';
 import { User } from '../interface/user';
 import * as cloudinary from 'cloudinary'
-import { Admin } from '../interface/admin';
-import * as fs from 'fs'
+import { Admin, NewAdmin } from '../interface/admin';
+import * as fs from 'fs';
+import {genSalt, hash} from 'bcrypt';
+import { AdminModel } from '../models/admin-model';
 
 export const postCategory = async (req: Request, res: Response) => {
   try {
@@ -150,6 +152,7 @@ export const putSortOrder = async (req:Request, res:Response)=>{
     const categories:any[] = req.body.categories 
 
     const idsToUpdate = categories.map((categoria) => categoria.id).join(',');
+
     let query = `UPDATE categories 
              SET sort_order = CASE id 
              ${categories.map((categoria) => `WHEN ${categoria.id} THEN ${categoria.sort_order}`).join(' ')}
@@ -212,7 +215,7 @@ export const putOptions = async (req: Request, res: Response) => {
       return 
     }
 
-    const productsRecovery:Product[] | any[] = await doQuery(`SELECT * FROM ${user.admin_table} WHERE id IN (${ products.join(',') })`, [user.local_id])
+    const productsRecovery:Product[] | any[] = await doQuery(`SELECT * FROM ? WHERE id IN (?)`, [user.admin_table, products.join(',')])
 
 
     const updatedProducts = productsRecovery.map((product: any) => {
@@ -269,6 +272,23 @@ export const deleteOptionGroup = async (req: Request, res: Response) => {
 };
 
 
-  
-  
+
+///********* */
+
+export const postAdmin = async (req: Request, res: Response) => {
+
+  try {
+      const newAdmin = req.body as NewAdmin
+      const salt = await genSalt(15)
+      newAdmin.password = await hash(newAdmin.password, salt)
+      const insertAdmin = await AdminModel.postAdmin(newAdmin)
+
+      res.status(201).json(insertAdmin)
+  } catch (err) {
+      console.log(err);
+      httpError(res, 'ERROR_REGISTER_ADMIN', 403)
+
+  }
+
+}
   

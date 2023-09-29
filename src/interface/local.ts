@@ -47,3 +47,10 @@ export interface DetailsOptions {
   price: number;
   active?: boolean;
 }
+
+
+export interface NewLocal{
+  name:string,
+  name_url:string,
+  phone:string,
+}

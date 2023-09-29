@@ -4,7 +4,8 @@ import { Request, Response } from 'express';
 import { checkData } from '../utils/checkData';
 import { Admin } from '../interface/admin';
 import { parseJson } from '../utils/parseData';
-import { Local } from '../interface/local';
+import { Local, NewLocal } from '../interface/local';
+import { LocalModel } from '../models/local-model';
 
 export const getLocal = async (req: Request, res: Response) => {
 
@@ -49,21 +50,26 @@ export const getAllLocals = async (req: Request, res: Response) => {
 };
 
 export const postLocal = async (req: Request, res: Response) => {
+
   try {
-    const { name, location, contact, description } = req.body;
+    const newLocal = req.body as NewLocal;
+    const insertLocal = await LocalModel.postLocal(newLocal)
 
-    const name_url: string = name.trim().toLowerCase().replace(' ', '');
+    const createTable = await LocalModel.createTableProducts(newLocal.name_url)
 
-    const data = await doQuery(
-      'INSERT INTO locals (name, name_url, location, contact, description) VALUES(?,?,?,?,?);',
-      [name, name_url, location, contact, description]
-    );
+    console.log(insertLocal);
+    console.log(createTable);
+    
 
-    res.status(201).json(data);
+    res.status(201).json(insertLocal);
+
   } catch (err: any) {
     httpError(res, err, 403);
   }
 };
+
+
+
 
 export const deleteLocal = async (req: Request, res: Response) => {
   try {
@@ -173,8 +179,8 @@ export const createTableLocal = async (req: Request, res: Response) => {
     const nameTable: string = name.trim().toLowerCase().replace(' ', '')
 
     const data = await doQuery(
-      `CREATE TABLE ${nameTable} (id serial NOT NULL, name varchar(255) NOT NULL,price longtext NOT NULL,ingredients longtext DEFAULT NULL,id_category int(11) NOT NULL, createdAt datetime DEFAULT  CURRENT_TIMESTAMP(), FOREIGN KEY (id_category) REFERENCES categories(id));`,
-      [false]
+      `CREATE TABLE ? (id serial NOT NULL, name varchar(255) NOT NULL,price longtext NOT NULL,ingredients longtext DEFAULT NULL,id_category int(11) NOT NULL, createdAt datetime DEFAULT  CURRENT_TIMESTAMP(), FOREIGN KEY (id_category) REFERENCES categories(id));`,
+      [nameTable]
     )
 
 
@@ -247,8 +253,8 @@ export const getRecents = async (req: Request, res: Response) => {
     const data:Local[] = await doQuery(
       `SELECT *
       FROM locals
-      WHERE id IN (${recents.join(', ')})`,
-      []
+      WHERE id IN (?)`,
+      [recents.join(', ')]
     )
     
     for (let i = 0; i < data.length; i++) {
@@ -267,3 +273,18 @@ export const getRecents = async (req: Request, res: Response) => {
   }
 };
 
+
+export const isPathAvailable = async (req:Request, res:Response) => {
+
+  const {path} = req.params
+
+  const localWhitPath:number[] = await doQuery('SELECT id FROM locals WHERE name_url = ?', [path])
+  console.log(localWhitPath);
+  
+  if (!localWhitPath[0]) {
+    return res.json(true)
+  }
+
+  res.json(false)
+
+}

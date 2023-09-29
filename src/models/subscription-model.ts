@@ -2,15 +2,15 @@ export class SuscriptionModel {
 
     private static baseUrlMp='https://api.mercadopago.com'
 
-  constructor() {}
+  constructor() {} 
 
-  public static async postSubscription({ token, payer, plan}: { token: string; payer: any; plan?:string}) {
+  public static async postSubscription({ token, payer, plan_id}: { token: string; payer: any; plan_id?:string}) {
 
     const preferences = {
-      preapproval_plan_id: plan || process.env.PREAPPROVAL_PLAN_ID,
+      preapproval_plan_id: plan_id || process.env.PREAPPROVAL_PLAN_ID,
       reason: "deli_subscriptor",
       external_reference: "DELI-APP",
-      payer_email: payer.email,
+      payer_email: payer['email'],
       card_token_id: token,
       status: "authorized",
     };

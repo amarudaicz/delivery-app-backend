@@ -7,11 +7,12 @@ export class UserModel {
 
   public static getUser(id: any): Promise<User[]> {
     const searchBy = typeof id === "number" ? "id" : "username";
-    return doQuery(`select * from users WHERE ${searchBy} = ?`, [id]);
+    
+    return doQuery(`select * from users WHERE ?? = ?`, [searchBy, id]);
   }
 
   public static postUser(user: User): Promise<User[]> {
-    return doQuery(`INSERT INTO users ?`, [user]);
+    return doQuery(`INSERT INTO users SET ?`, [user]);
   }
   
   public static getAllUsers(): Promise<User[]> {

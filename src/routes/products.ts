@@ -22,7 +22,7 @@ router.get('/get-one/:local/:id', getProduct);
 
 router.post('/', checkTokenStrict, checkUserState, upload.single('image'), capitalize(false, ['name', 'description']), postProduct);
 
-router.put('/update-stock', checkTokenStrict, checkUserState, checkUserState, updateStockProduct);
+router.put('/update-stock', checkTokenStrict, checkUserState, updateStockProduct);
 
 router.put('/', checkTokenStrict, checkUserState, upload.single('image'), updateProduct);
 
