@@ -1,7 +1,7 @@
 import mysql2, { PoolOptions } from "mysql2";
 
 
-const pool = mysql2.createPool(process.env.DB_URI as PoolOptions)
+const pool = mysql2.createConnection(process.env.DB_URI as PoolOptions)
 
 //  const pool = mysql2.createPool({
 //   connectionLimit: 10,
@@ -21,13 +21,13 @@ const pool = mysql2.createPool(process.env.DB_URI as PoolOptions)
  
 
 export const poolConnection = () => {
-  pool.getConnection((err) => {
+  pool.connect((err) => {
     if (err) { 
       console.log(err);
     } else {
       console.log("R");
     } 
-  }); 
+  });  
 }; 
 
 export const doQuery = <T>(query: string, data: any) => {
