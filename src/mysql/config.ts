@@ -1,16 +1,16 @@
 import mysql2, { PoolOptions } from "mysql2";
 
 
-const pool = mysql2.createConnection(process.env.DB_URI as PoolOptions)
+// const pool = mysql2.createPool(process.env.DB_URI as PoolOptions)
 
-//  const pool = mysql2.createPool({
-//   connectionLimit: 10,
-//   user: process.env.DB_USER,
-//   password:process.env.DB_PASSWORD ,
-//   port:Number(process.env.DB_PORT),
-//   host:process.env.DB_HOST ,
-//   database:process.env.DB_NAME 
-//  });  
+const pool = mysql2.createPool({
+ connectionLimit: 10,
+ user: process.env.DB_USER,
+ password:process.env.DB_PASSWORD ,
+ port:Number(process.env.DB_PORT),
+ host:process.env.DB_HOST ,
+ database:process.env.DB_NAME 
+});  
    
   
  
@@ -21,13 +21,13 @@ const pool = mysql2.createConnection(process.env.DB_URI as PoolOptions)
  
 
 export const poolConnection = () => {
-  pool.connect((err) => {
+  pool.getConnection((err) => {
     if (err) { 
       console.log(err);
     } else {
       console.log("R");
     } 
-  });  
+  }); 
 }; 
 
 export const doQuery = <T>(query: string, data: any) => {
@@ -41,4 +41,3 @@ export const doQuery = <T>(query: string, data: any) => {
   });
 };
 
-poolConnection() 

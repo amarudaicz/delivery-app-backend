@@ -88,20 +88,14 @@ export const putLocal = async (req: Request, res: Response) => {
 
     const user = (req as any).user
     const updateFields:any = {}
-    
-    const { id, name, location, description, schedules, aliascbu, pick_in_local, delivery_cost, delivery_time, instagram, maps, website, phone, image, options } = req.body;
-    
-    for (const field in req.body){
 
-      if (field !== 'id' && (field === 'options' || field === 'schedules' || field ===  'links' || field ===  'shipping'||field === 'pay_methods'))
+    for (const field in req.body){
+      if ((field === 'options' || field === 'schedules' || field ===  'links' || field ===  'shipping'||field === 'pay_methods'))
       updateFields[field] = JSON.stringify(req.body[field])
       else  
       updateFields[field] = req.body[field];
-      
     }
 
-    
-    
     const data = await doQuery(
       `UPDATE locals SET ?
       WHERE id = ?;`,
@@ -109,58 +103,6 @@ export const putLocal = async (req: Request, res: Response) => {
     );
     
     
-
-    res.json(data);
-  } catch (err: any) {
-    console.log(err);
-
-    httpError(res, 'ERROR', 403);
-  }
-};
-
-
-export const updateLocal = async (req: Request, res: Response) => {
-
-  try {
-
-    const user = (req as any).user
-    
-
-    const { id, name, location, description, schedules, aliascbu, pick_in_local, delivery_cost, delivery_time, instagram, maps, website, phone, image, options } = req.body;
-    // const name_url: string = name.trim().toLowerCase().replace(' ', '');
-
-    if (options) {
-      const data = await doQuery(
-        `UPDATE locals SET 
-        options_group = ?
-    
-        WHERE id = ?;`,
-        [JSON.stringify(options), user.local_id]
-      );
-
-      res.json(data)
-      return
-    }
-
-
-    const data = await doQuery(
-      `UPDATE locals SET 
-      name = ?, 
-      location = ?, 
-      phone = ?, 
-      description = ?, 
-      image = ?, 
-      schedules = ?, 
-      delivery_cost = ?, 
-      delivery_time = ?,
-      aliascbu = ?,
-      pick_in_local = ?,
-      instagram = ?, 
-      maps=?,
-      website= ? 
-      WHERE id = ?;`,
-      [name, location, phone, description, image, JSON.stringify(schedules), delivery_cost, delivery_time, aliascbu, pick_in_local, instagram, maps, website, user.local_id]
-    );
 
     res.json(data);
   } catch (err: any) {
@@ -242,20 +184,26 @@ export const getRecents = async (req: Request, res: Response) => {
 
   try {
 
-    const { recents } = req.body
+    const { recents }:{recents:number[]} = req.body
 
     if (checkData(recents)) {
       res.json([])
       return
     }
 
- 
+    console.log(recents);
+    
+    
+    const placeholders = recents.map(()=>'?').join(',')
+
     const data:Local[] = await doQuery(
       `SELECT *
       FROM locals
-      WHERE id IN (?)`,
-      [recents.join(', ')]
+      WHERE id IN (${recents.join(',')})`,
+      []
     )
+    console.log(data);
+    
     
     for (let i = 0; i < data.length; i++) {
       data[i].schedules = parseJson(data[i].schedules)

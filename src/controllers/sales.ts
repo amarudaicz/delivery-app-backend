@@ -14,12 +14,12 @@ interface Sale {
 
 export const postSale = async (req: Request, res: Response) => {
   try {
-    const { id: local_id, ammount } = req.body;
+    const { id: local_id, amount } = req.body;
     const date = formatDate(new Date());
 
     const data = await doQuery(
-      `INSERT INTO sales (local_id, date, ammount) VALUES (?, ?, ?)`,
-      [local_id, date, ammount]
+      `INSERT INTO sales (local_id, date, amount) VALUES (?, ?, ?)`,
+      [local_id, date, amount]
     );
 
     res.send("ok");
