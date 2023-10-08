@@ -12,7 +12,7 @@ router.post('/', postAdmin);
 
 
 //CATEGORIES
-router.get('/get-categories',checkTokenStrict, getCategories); 
+router.get('/get-categories',checkTokenStrict, checkUserState, getCategories); 
 router.post('/categories', checkTokenStrict, checkUserState, upload.single('image'), postCategory);
 router.put('/categories', checkTokenStrict, checkUserState, upload.single('image'), updateCategory);
 router.put('/categories/set-active', checkTokenStrict, checkUserState, stateCategory);

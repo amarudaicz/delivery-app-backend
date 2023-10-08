@@ -12,7 +12,7 @@ import {
   isPathAvailable
 } from '../controllers/locals';
 import { checkToken, checkTokenStrict } from '../middleware/checkToken';
-import { checkUserState } from '../middleware/checkUserState';
+import { checkUserState, insertUserRequest } from '../middleware/checkUserState';
 
 export const router = Router();
 
@@ -21,7 +21,7 @@ router.post('/', postLocal);
 
 router.put('/',checkTokenStrict, checkUserState, putLocal);
 
-router.get('/:local?', checkToken, getLocal);
+router.get('/:local?', checkToken, insertUserRequest, getLocal);
 
 router.post('/get-recents', getRecents);
 

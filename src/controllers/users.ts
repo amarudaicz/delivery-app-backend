@@ -6,7 +6,8 @@ import { cleanUser } from "../utils/cleanUser";
 export const getUser = async (req:Request|any, res:Response) =>{
     try {
         const {paramsId} = req.params
-        const {id} = req.user
+
+        const {id} = req.payload
 
         const user = cleanUser((await UserModel.getUser(paramsId ?? id))[0])
         console.log(user);

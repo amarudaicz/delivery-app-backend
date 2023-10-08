@@ -4,7 +4,7 @@ export class SuscriptionModel {
 
   constructor() {} 
 
-  public static async postSubscription({ token, payer, plan_id}: { token: string; payer: any; plan_id?:string}) {
+  public static async post({ token, payer, plan_id}: { token: string; payer: any; plan_id?:string}) {
 
     const preferences = {
       preapproval_plan_id: plan_id || process.env.PREAPPROVAL_PLAN_ID,
@@ -29,4 +29,41 @@ export class SuscriptionModel {
 
     return subStatusJson;
   }
+
+
+  public static async get(sub_id:string) {
+
+    const sub = await fetch(`${this.baseUrlMp}/preapproval/${sub_id}`, {
+      method: "GET",
+      headers: {
+        Authorization:
+          `Bearer ${process.env.ACCESS_TOKEN_MP}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const subData = await sub.json();
+    console.log(subData);
+    
+    return subData;
+  }
+
+  public static async put(body:any, sub_id:string) {
+
+    console.log(body);
+    
+    const update = await fetch(`${this.baseUrlMp}/preapproval/${sub_id}`, {
+      method: "PUT",
+      headers: {
+       Authorization: `Bearer ${process.env.ACCESS_TOKEN_MP}`,
+        "Content-Type": "application/json",
+      },
+      body:JSON.stringify(body)
+    });
+
+    const subUpdate = await update.json();
+    return subUpdate;
+  }
+
+
 }

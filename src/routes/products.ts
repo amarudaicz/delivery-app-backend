@@ -11,13 +11,13 @@ import {
 import { checkToken, checkTokenStrict } from '../middleware/checkToken';
 import multer from 'multer';
 import { capitalize } from '../utils/capitalize';
-import { checkUserState } from '../middleware/checkUserState';
+import { checkUserState, insertUserRequest } from '../middleware/checkUserState';
 import upload from '../config/multer';
 
 const router = Router();
 
 
-router.get('/:table?', checkToken, getProducts);
+router.get('/:table?', checkToken, insertUserRequest, getProducts);
 router.get('/get-one/:local/:id', getProduct);
 
 router.post('/', checkTokenStrict, checkUserState, upload.single('image'), capitalize(false, ['name', 'description']), postProduct);

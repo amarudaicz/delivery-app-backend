@@ -10,7 +10,6 @@ import {rm} from 'fs'
 export const getProducts = async (req: Request, res: Response) => {
   try {
 
-
     const table: string = req.params.table || (req as any).user?.admin_table
 
     console.log(table);

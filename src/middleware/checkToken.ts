@@ -12,7 +12,7 @@ export function checkTokenStrict(req: any, res: Response, next: NextFunction) {
     try {
         const decoded = verifyJwt(token)
         if (decoded){
-            req.user = decoded; // Aquí agregamos el payload decodificado a la solicitud
+            req.payload = decoded; // Aquí agregamos el payload decodificado a la solicitud
             next();
         }else{
             return httpError(res, 'Token not valid', 403);
@@ -28,6 +28,6 @@ export function checkToken(req: any, res: Response, next: NextFunction) {
     if (!token) return next()
     
     const decoded = verifyJwt(token)
-    req.user = decoded; // agregamos el payload decodificado a la solicitud
+    req.payload = decoded; // agregamos el payload decodificado a la solicitud
     next()
 } 
