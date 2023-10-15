@@ -9,7 +9,7 @@ export interface Admin{
     admin:1|0,
     root:1|0,
     register_date:Date,
-    sub_id:number
+    sub_id:string
     sub_type:'string',
     sub_status:1|0
 }

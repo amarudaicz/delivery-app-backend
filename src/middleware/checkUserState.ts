@@ -4,8 +4,6 @@ import { httpError } from "../utils/httpError";
 
 export const checkUserState = async ( req:Request|any, res:Response, next:NextFunction)=>{
     try {   
-
-
         const {id} = req.payload
 
         console.log(id);
@@ -14,7 +12,6 @@ export const checkUserState = async ( req:Request|any, res:Response, next:NextFu
         
         if(!user.active) return httpError(res, 'Tu cuenta se encuentra inactiva, porfavor ponte en contacto con nosotros', 401)
         if(!user.sub_id) return httpError(res, 'Tu cuenta no tiene un metodo de pago activo, porfavor ponte en contacto con nosotros', 402)
-
 
         
         req.user = user
@@ -27,12 +24,11 @@ export const checkUserState = async ( req:Request|any, res:Response, next:NextFu
 
 export const insertUserRequest = async (req:Request|any, res:Response, next:NextFunction) => {
     try {   
+
+        if (!req.payload) return next()            
+
         const {id} = req.payload
 
-        if (!id) {
-            next()            
-            return
-        }
         
         const user = (await UserModel.getUser(id))[0]   
         

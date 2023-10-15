@@ -8,6 +8,9 @@ import { Admin, NewAdmin } from '../interface/admin';
 import * as fs from 'fs';
 import {genSalt, hash} from 'bcrypt';
 import { AdminModel } from '../models/admin-model';
+import { UserModel } from '../models/user';
+import { LocalModel } from '../models/local-model';
+import { SubscriptionModel } from '../models/subscription-model';
 
 export const postCategory = async (req: Request, res: Response) => {
   try {
@@ -288,6 +291,29 @@ export const postAdmin = async (req: Request, res: Response) => {
       console.log(err);
       httpError(res, 'ERROR_REGISTER_ADMIN', 403)
 
+  }
+
+}
+
+export const deleteAccount = async (req: Request, res: Response) => {
+
+  try {
+
+    const { user }:{user:Admin} = (req as any)
+    
+    const cancelSubscription = await SubscriptionModel.cancel(user.sub_id)
+    if (!cancelSubscription.id) {
+      httpError(res, 'A ocurrido un error', 401)
+      return
+    }
+    const deleteUser = await UserModel.deleteUser(user.id)
+    const deleteLocal = await LocalModel.deleteLocal(user.local_id)
+    const deleteTableProducts = await LocalModel.deleteTableProducts(user.admin_table)
+
+    res.json({exit:true})
+  } catch (err:any) {
+      console.log(err);
+      httpError(res, err, 403)
   }
 
 }

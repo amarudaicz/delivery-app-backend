@@ -1,4 +1,4 @@
-export class SuscriptionModel {
+export class SubscriptionModel {
 
     private static baseUrlMp='https://api.mercadopago.com'
 
@@ -64,6 +64,23 @@ export class SuscriptionModel {
     const subUpdate = await update.json();
     return subUpdate;
   }
+
+  public static async cancel(sub_id:string) {
+    const cancel = await fetch(`${this.baseUrlMp}/preapproval/${sub_id}`, {
+      method: "PUT",
+      headers: {
+       Authorization: `Bearer ${process.env.ACCESS_TOKEN_MP}`,
+        "Content-Type": "application/json",
+      },
+      body:JSON.stringify({status:'cancelled'})
+    });
+
+    const subUpdate = await cancel.json();
+    return subUpdate;
+  }
+
+
+  
 
 
 }

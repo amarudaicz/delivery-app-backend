@@ -9,6 +9,16 @@ export class LocalModel {
     return doQuery<ResultSetHeader>("INSERT INTO locals SET ?", [newLocal]);
   }
 
+  public static async deleteLocal(id:number){
+    return doQuery<ResultSetHeader>(
+        'DELETE FROM locals WHERE id = ?;',[id]
+    );
+  }
+
+  public static deleteTableProducts(admin_table:string){
+    return doQuery('DROP TABLE ??', [admin_table])
+  }
+
   public static createTableProducts(name_url: string) {
     return doQuery<ResultSetHeader>(
       `CREATE TABLE ?? (

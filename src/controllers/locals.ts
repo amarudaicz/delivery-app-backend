@@ -34,7 +34,6 @@ export const getLocal = async (req: Request, res: Response) => {
 
   } catch (err: any) {
     console.log(err);
-
     httpError(res, err, 403);
   }
 

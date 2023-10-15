@@ -23,6 +23,12 @@ export class UserModel {
     return doQuery(`UPDATE users SET ? WHERE id = ?`, [user, user.id]);
   }
 
+  public static async deleteUser(id:number){
+    return doQuery<ResultSetHeader>(
+        'DELETE FROM users WHERE id = ?;',[id]
+    );
+}
+
 
 
 }

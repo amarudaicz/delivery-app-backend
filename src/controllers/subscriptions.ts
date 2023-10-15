@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { httpError } from "../utils/httpError";
 import * as mp from "mercadopago";
-import { SuscriptionModel } from "../models/subscription-model";
+import { SubscriptionModel } from "../models/subscription-model";
 import { AdminModel } from "../models/admin-model";
 import { LocalModel } from "../models/local-model";
 
@@ -11,7 +11,7 @@ export const postSubscription = async (req: Request, res: Response) => {
     const { token, payer, store, user } = req.body;
 
     const subscription: { id: string; payer_id: number } =
-      await SuscriptionModel.post({ token, payer });
+      await SubscriptionModel.post({ token, payer });
     console.log(subscription);
 
     if (!subscription.id) {
@@ -39,7 +39,7 @@ export const getSubscription = async (req: Request | any, res: Response) => {
   try {
     const { sub_id } = req.user;
 
-    const sub = await SuscriptionModel.get(sub_id);
+    const sub = await SubscriptionModel.get(sub_id);
 
     res.json(sub);
   } catch (err:any) {
@@ -53,7 +53,14 @@ export const putSubscription = async (req: Request | any, res: Response) => {
     const {sub_id} = req.user;
     const {status} = req.body
 
-    const subUpdate = await SuscriptionModel.put({status}, sub_id);
+    const subUpdate = await SubscriptionModel.put({status}, sub_id);
+
+    console.log(subUpdate);
+    
+    if (!subUpdate.id) {
+      httpError(res, subUpdate.message)
+      return
+    }
 
     res.json(subUpdate);
   } catch (err:any) {

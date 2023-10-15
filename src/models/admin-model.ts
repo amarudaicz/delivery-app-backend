@@ -21,4 +21,6 @@ export class AdminModel {
             'INSERT INTO users SET ?;',[newAdmin]
         );
     }
+
+  
 }

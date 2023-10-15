@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { deleteCategory, deleteOptionGroup, getCategories, postAdmin, postCategory, postOptions, putOptions, putSortOrder, stateCategory, updateCategory } from '../controllers/admin';
+import { deleteAccount, deleteCategory, deleteOptionGroup, getCategories, postAdmin, postCategory, postOptions, putOptions, putSortOrder, stateCategory, updateCategory } from '../controllers/admin';
 import { checkTokenStrict } from '../middleware/checkToken';
 import upload from '../config/multer';
 import multer from 'multer';
-import { checkUserState } from '../middleware/checkUserState';
+import { checkUserState, insertUserRequest } from '../middleware/checkUserState';
 
 const router = Router();
  
@@ -18,6 +18,7 @@ router.put('/categories', checkTokenStrict, checkUserState, upload.single('image
 router.put('/categories/set-active', checkTokenStrict, checkUserState, stateCategory);
 router.delete('/categories/:id', checkTokenStrict, checkUserState, deleteCategory);
 router.put('/categories/sort-order', checkTokenStrict, checkUserState, putSortOrder);  
+router.delete('/delete-account', checkTokenStrict, insertUserRequest, deleteAccount);
 
 
 
