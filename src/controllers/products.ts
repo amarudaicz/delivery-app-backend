@@ -71,24 +71,38 @@ export const postProduct = async (req: Request, res: Response) => {
     
     const { name, price, category_id, description, variations, ingredients } = req.body as Product;
     
+    console.log(image);
+    
     if (image) {
       const imageUpload = await cloudinary.v2.uploader.upload(image.path, { 
         folder: user.admin_table,
         public_id: name.replace(' ', '-' ).trim() || name,
         overwrite: true,
-        quality: 90
+        quality: 90,
+        eager_async:true,
+        
       });
+
+      if (!imageUpload.url) {
+        httpError(res, 'A ocurrido un error al cargar tu imagen, porfavor intenta nuevamente en unos minutos')
+        return
+      }
+
+
       console.log(imageUpload);
       imageUrl = imageUpload.secure_url;
+      console.log('paso hasta aca');
       rm(image.path, ()=> console.log('rm->' + image.path))
-      
     }
     
       const data = await doQuery(
-        `INSERT INTO ${user.admin_table} (name, local_id, image, price, ingredients, category_id, description, variations) VALUES(?,?,?,?,?,?,?,?)`,
-        [name, user.local_id, imageUrl, price, ingredients, category_id, description === 'Null' ? null : description, variations]
+        `INSERT INTO ?? (name, local_id, image, price, ingredients, category_id, description, variations) VALUES(?,?,?,?,?,?,?,?)`,
+        [user.admin_table, name, user.local_id, imageUrl, price, ingredients, category_id, description === 'Null' ? null : description, variations]
       );
-    
+
+      console.log({this:data});
+      
+      
     return res.json(data);
   } catch (err: any) {
     console.log(err);
