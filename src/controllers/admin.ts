@@ -12,6 +12,55 @@ import { UserModel } from '../models/user';
 import { LocalModel } from '../models/local-model';
 import { SubscriptionModel } from '../models/subscription-model';
 
+
+
+
+
+
+
+export const getProducts = async (req: Request, res: Response) => {
+  try {
+
+    const table: string = (req as any).user?.admin_table
+
+    if (!table) {
+      return httpError(res, 'No hay tabla para consultar', 403)
+    }
+
+    //INTERFACE Product
+    let data: any[] = await doQuery(
+      `SELECT ??.id, name, stock, price, ingredients, ??.local_id, image, category_id, category_name, category_image, categories.active as category_active, categories.sort_order as category_sort, variations, description FROM ?? INNER JOIN categories ON categories.id = ??.category_id AND categories.local_id = ??.local_id`,
+      [table, table, table,table, table]
+    );
+
+    console.log(data);
+    
+    for (let i = 0; i < data.length; i++) {
+      data[i].variations ? data[i].variations = JSON.parse(data[i].variations) : null
+      data[i].ingredients ? data[i].ingredients = JSON.parse(data[i].ingredients) : null
+    } 
+    
+    res.json(data);
+  } catch (err: any) {
+    console.log(err);
+    httpError(res, 'ERROR_GET_PRODUCTS', 403);
+  } 
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export const postCategory = async (req: Request, res: Response) => {
   try {
 
@@ -218,7 +267,7 @@ export const putOptions = async (req: Request, res: Response) => {
       return 
     }
 
-    const productsRecovery:Product[] | any[] = await doQuery(`SELECT * FROM ? WHERE id IN (?)`, [user.admin_table, products.join(',')])
+    const productsRecovery:Product[] | any[] = await doQuery(`SELECT * FROM ?? WHERE id IN (?)`, [user.admin_table, products.join(',')])
 
 
     const updatedProducts = productsRecovery.map((product: any) => {
@@ -230,7 +279,7 @@ export const putOptions = async (req: Request, res: Response) => {
     
     // Construir la consulta SQL con múltiples valores
     const updateQuery = `
-      UPDATE ${user.admin_table}
+      UPDATE ??
       SET variations = CASE 
         ${updatedProducts.map((product: any) => `WHEN id = ${product.id} THEN '${JSON.stringify(product.variations)}'`).join(' ')}
         ELSE variations
@@ -238,7 +287,7 @@ export const putOptions = async (req: Request, res: Response) => {
       WHERE id IN (${products.join(',')})
     `;
 
-    const data = await doQuery(updateQuery, []);
+    const data = await doQuery(updateQuery, [user.admin_table]);
     
 
     res.send(data).status(200)

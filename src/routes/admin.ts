@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { deleteAccount, deleteCategory, deleteOptionGroup, getCategories, postAdmin, postCategory, postOptions, putOptions, putSortOrder, stateCategory, updateCategory } from '../controllers/admin';
+import { deleteAccount, deleteCategory, deleteOptionGroup, getCategories, getProducts, postAdmin, postCategory, postOptions, putOptions, putSortOrder, stateCategory, updateCategory } from '../controllers/admin';
 import { checkTokenStrict } from '../middleware/checkToken';
 import upload from '../config/multer';
 import multer from 'multer';
@@ -9,6 +9,11 @@ const router = Router();
  
 
 router.post('/', postAdmin); 
+
+router.get('/products', checkTokenStrict, checkUserState, getProducts )
+// router.get('/local', )
+
+
 
 
 //CATEGORIES
