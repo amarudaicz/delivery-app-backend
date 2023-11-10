@@ -16,7 +16,8 @@ export const postSale = async (req: Request, res: Response) => {
   try {
     const { id: local_id, amount } = req.body;
     const date = formatDate(new Date());
-
+    console.log(amount, 'NUEVA VENTA');
+    
     const data = await doQuery(
       `INSERT INTO sales (local_id, date, amount) VALUES (?, ?, ?)`,
       [local_id, date, amount]
@@ -31,8 +32,6 @@ export const postSale = async (req: Request, res: Response) => {
 export const getSales = async (req: Request , res: Response) => {
   try {
     const { local_id } = (req as any).user;
-    console.log((req as any).user);
-    
     
     // Query to get visits grouped by date
     const query = `

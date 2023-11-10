@@ -15,7 +15,8 @@ interface Stat{
 export const postView = async (req: Request, res: Response) => {
   const local_id = req.body.id;
   const date = formatDate(new Date());
-
+  console.log('NUEVA VISTA');
+  
   const data = await doQuery(
     `INSERT INTO stats (local_id, date) VALUES (?, ?)`,
     [local_id, date]

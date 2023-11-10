@@ -189,9 +189,6 @@ export const getRecents = async (req: Request, res: Response) => {
       res.json([])
       return
     }
-
-    console.log(recents);
-    
     
     const placeholders = recents.map(()=>'?').join(',')
 
@@ -201,8 +198,6 @@ export const getRecents = async (req: Request, res: Response) => {
       WHERE id IN (${recents.join(',')})`,
       []
     )
-    console.log(data);
-    
     
     for (let i = 0; i < data.length; i++) {
       data[i].schedules = parseJson(data[i].schedules)
