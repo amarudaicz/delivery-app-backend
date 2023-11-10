@@ -62,13 +62,13 @@ export const resetPasswordTemplate = (user:Admin, token:string) => {
             <p>Hola, ${user.username}</p>
             <p>Hemos recibido una solicitud para restablecer la contraseña de tu cuenta. Si no realizaste esta solicitud, puedes ignorar este correo electrónico.</p>
             <p>Si deseas restablecer tu contraseña, haz clic en el siguiente botón:</p>
-            <a style:color:#fff; href="http://localhost:4200/#/login/reset_password?token=${token}" class="btn">Restablecer Contraseña</a>
+            <a style:color:#fff; href="https://delitienda.app/login/reset_password?token=${token}" class="btn">Restablecer Contraseña</a>
             <p>Si tienes algún problema con el botón, también puedes copiar y pegar el siguiente enlace en tu navegador:</p>
-            <p>http://localhost:4200/#/login/reset_password?token=${token}</p>
+            <p>http://delitienda.app/login/reset_password?token=${token}</p>
 
            <p> DELI nunca enviará un correo electrónico en el que solicite que se revele o verifique una contraseña, una tarjeta de crédito o un número de cuenta bancaria. Si recibe un correo electrónico sospechoso con un enlace para actualizar la información de la cuenta, no haga clic en el enlace. En su lugar, reporte el correo electrónico a Deli para que se investigue. </p>
 
-            <p>Gracias,</p>
+            <p>Gracias</p>
             <p>El equipo de DELI</p>
         </div>
     </body>
@@ -76,7 +76,7 @@ export const resetPasswordTemplate = (user:Admin, token:string) => {
     </html>
     `,
     subject:'Restablecer contraseña',
-    text:'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa'
+    text:''
    }
 
 }
