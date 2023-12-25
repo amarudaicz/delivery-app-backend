@@ -33,3 +33,6 @@ const encriptPass = async (pass:string)=>{
     const password = await hash(pass, salt)
     console.log(password);
 }
+
+encriptPass('tala');
+

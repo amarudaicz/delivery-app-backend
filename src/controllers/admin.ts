@@ -29,7 +29,7 @@ export const getProducts = async (req: Request, res: Response) => {
 
     //INTERFACE Product
     let data: any[] = await doQuery(
-      `SELECT ??.id, name, stock, price, ingredients, ??.local_id, image, category_id, category_name, category_image, categories.active as category_active, categories.sort_order as category_sort, variations, description FROM ?? INNER JOIN categories ON categories.id = ??.category_id AND categories.local_id = ??.local_id`,
+      `SELECT ??.id, name, stock, price, ingredients, ??.local_id, image, category_id, category_name, category_image, categories.active as category_active, categories.sort_order as category_sort, variations, description, fixed FROM ?? INNER JOIN categories ON categories.id = ??.category_id AND categories.local_id = ??.local_id`,
       [table, table, table,table, table]
     );
 

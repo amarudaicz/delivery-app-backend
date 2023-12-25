@@ -20,7 +20,7 @@ export const getProducts = async (req: Request, res: Response) => {
 
     //INTERFACE Product
     let data: any[] = await doQuery(
-      `SELECT ${table}.id, name, stock, price, ingredients, ${table}.local_id, image, category_id, category_name, category_image, categories.active as category_active, categories.sort_order as category_sort, variations, description FROM ${table} INNER JOIN categories ON categories.id = ${table}.category_id AND categories.local_id = ${table}.local_id`,
+      `SELECT ${table}.id, name, stock, price, ingredients, ${table}.local_id, image, category_id, category_name, category_image, categories.active as category_active, categories.sort_order as category_sort, variations, description, fixed FROM ${table} INNER JOIN categories ON categories.id = ${table}.category_id AND categories.local_id = ${table}.local_id`,
       []
     );
 
@@ -51,7 +51,7 @@ export const getProduct = async (req: Request, res: Response) => {
 
 
     if (checkData(data))
-      return httpError(res, "No se han encotrado producto", 403);
+      return httpError(res, "No se han encontrado productos", 403);
 
     res.json(data);
   } catch (err: any) {
@@ -67,10 +67,7 @@ export const postProduct = async (req: Request, res: Response) => {
     const image = req.file;
     let imageUrl:any = null;
     
-    
     const { name, price, category_id, description, variations, ingredients } = req.body as Product;
-    
-    console.log(image);
     
     if (image) {
       const imageUpload = await cloudinary.v2.uploader.upload(image.path, { 
@@ -157,13 +154,12 @@ export const updateProduct = async (req: Request, res: Response) => {
       
       imageUrl = imageUpload.secure_url;
     }
-    
-
 
     const data = await doQuery(
       `UPDATE ${user.admin_table} SET name=?, image=?, price=?, ingredients=?, description=?, variations=? WHERE id = ? `,
       [name, imageUrl ? imageUrl : (image === 'null' ? null : image), price, ingredients, description === 'null' ? null : description, variations, id]
     );
+
 
     res.json(data);
   } catch (err: any) {
@@ -172,6 +168,21 @@ export const updateProduct = async (req: Request, res: Response) => {
   }
 };
 
+
+export const updateFixedProduct = async (req:Request, res:Response)=>{
+  try{
+    const user  = (req as any).user as Admin;
+    const {id:idProduct, fixed} = req.body
+
+    const data = await doQuery(`UPDATE ${user.admin_table} SET fixed = ? WHERE id = ?`, [fixed, idProduct])
+
+
+    res.json(data)
+
+  }catch(err){
+
+  }
+}
 
 
 export const updateStockProduct = async (req:Request, res:Response)=>{
