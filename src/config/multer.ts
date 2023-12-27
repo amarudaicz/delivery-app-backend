@@ -19,17 +19,17 @@ export default upload;
 import fs from 'fs';
 
 
-function logRootFolders(rootPath:any) {
-  const items = fs.readdirSync(rootPath);
+// function logRootFolders(rootPath:any) {
+//   const items = fs.readdirSync(rootPath);
 
-  const folders = items.filter(item => {
-    const itemPath = path.join(rootPath, item);
-    return fs.statSync(itemPath).isDirectory();
-  });
+//   const folders = items.filter(item => {
+//     const itemPath = path.join(rootPath, item);
+//     return fs.statSync(itemPath).isDirectory();
+//   });
 
-  console.log(`Root Folders for ${rootPath}:`);
-  console.log(folders.join('\n'));
-}
+//   console.log(`Root Folders for ${rootPath}:`);
+//   console.log(folders.join('\n'));
+// }
 
-const rootFolder = path.resolve('./'); // Ruta absoluta de la carpeta raíz del script
-logRootFolders(rootFolder);
+// const rootFolder = path.resolve('./'); // Ruta absoluta de la carpeta raíz del script
+// logRootFolders(rootFolder);
