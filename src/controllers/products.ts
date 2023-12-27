@@ -85,7 +85,7 @@ export const postProduct = async (req: Request, res: Response) => {
         rm(image.path, ()=> console.log('rm->' + image.path))
       } catch (err) {
         console.log(err);
-         httpError(res, 'A ocurrido un error al cargar tu imagen, intenta nuevamente en unos minutos')
+         return httpError(res, 'A ocurrido un error al cargar tu imagen, intenta nuevamente en unos minutos')
       }
     }
     
