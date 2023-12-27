@@ -5,7 +5,7 @@ import path from 'path';
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     console.log();
-    cb(null, './dist/uploads/'); // Directorio donde se guardarán los archivos
+    cb(null, 'uploads/'); // Directorio donde se guardarán los archivos
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + '-' + file.originalname); // Nombre del archivo
@@ -31,5 +31,5 @@ function logRootFolders(rootPath:any) {
   console.log(folders.join('\n'));
 }
 
-const rootFolder = path.resolve('./dist'); // Ruta absoluta de la carpeta raíz del script
+const rootFolder = path.resolve('./'); // Ruta absoluta de la carpeta raíz del script
 logRootFolders(rootFolder);
