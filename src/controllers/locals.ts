@@ -14,7 +14,7 @@ export const getLocal = async (req: Request, res: Response) => {
 
     if (!table) return httpError(res, 'No hay tabla para consultar', 403)
 
-    const data:Local[] = await doQuery('SELECT * FROM locals WHERE name_url = ?;', [
+    const data:Local[] = await doQuery('SELECT * FROM locals WHERE name_url = ? AND active = 1 ;', [
       table,
     ]);
 

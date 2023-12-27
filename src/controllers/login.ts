@@ -26,9 +26,9 @@ export const login = async (req: Request, res: Response) => {
             return httpError(res, 'No existe un usuario registrado', 401)
         }
 
-        // if (!user.active || !user.subscription_status) {
-        //     return httpError(res, 'Tu cuenta se encuentra inactiva por falta de pago, porfavor ponte en contacto con nostros', 402)
-        // }
+        if (!user.active) {
+            return httpError(res, 'Tu cuenta se encuentra inactiva por falta de pago, ponte en contacto con nosotros', 402)
+        }
         
         const checkPassword = await bcrypt.compare(password, user.password)
 
