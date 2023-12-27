@@ -5,7 +5,7 @@ import path from 'path';
 const storage = multer.diskStorage({
 
   destination: function (req, file, cb) {
-      const uploadDirectory = path.resolve(__dirname, '../uploads');
+      const uploadDirectory = path.resolve(__dirname, './uploads');
       console.log(uploadDirectory);
       
     cb(null, uploadDirectory); // Directorio donde se guardarán los archivos
@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
   }
 });
 
-const uploadDirectory = path.resolve(__dirname, '../uploads');
+const uploadDirectory = path.resolve(__dirname, './uploads');
 console.log(uploadDirectory);
 
 const upload = multer({ storage: storage });

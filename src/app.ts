@@ -16,7 +16,8 @@ const envFilePath = path.resolve(__dirname, '../.env');
 dotenv.config({path:envFilePath})
 cloudConfig()
 poolConnection()
-const uploadDirectory = path.resolve(__dirname, '../uploads');
+
+const uploadDirectory = path.resolve(__dirname, './uploads');
 console.log(uploadDirectory);
 
 const PORT = process.env.PORT || 3001
