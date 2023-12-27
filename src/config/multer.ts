@@ -5,12 +5,12 @@ import path from 'path';
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     console.log();
-    cb(null, 'uploads/'); // Directorio donde se guardarán los archivos
+    cb(null, path.resolve('./dist/uploads/')); // Directorio donde se guardarán los archivos
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + '-' + file.originalname); // Nombre del archivo
   }
-});
+}); 
 
 const upload = multer({ storage: storage });
 export default upload;
@@ -18,22 +18,18 @@ export default upload;
 // logFolderStructure.js
 import fs from 'fs';
 
-function logFolderStructure(folderPath:any, indent = 0) {
-  const files = fs.readdirSync(folderPath);
 
-  files.forEach((file:any) => {
-    const filePath = path.join(folderPath, file);
-    const stats = fs.statSync(filePath);
+function logRootFolders(rootPath:any) {
+  const items = fs.readdirSync(rootPath);
 
-    if (stats.isDirectory()) {
-      console.log(`${' '.repeat(indent)}[${file}] (Folder)`);
-      logFolderStructure(filePath, indent + 2); // Recursivamente, para carpetas
-    } else {
-      console.log(`${' '.repeat(indent)}${file} (File)`);
-    }
+  const folders = items.filter(item => {
+    const itemPath = path.join(rootPath, item);
+    return fs.statSync(itemPath).isDirectory();
   });
+
+  console.log(`Root Folders for ${rootPath}:`);
+  console.log(folders.join('\n'));
 }
 
-const rootFolder = path.resolve(__dirname); // Ruta absoluta de la carpeta raíz del script
-console.log(`Folder Structure for ${rootFolder}:`);
-logFolderStructure(rootFolder);
+const rootFolder = path.resolve('./dist'); // Ruta absoluta de la carpeta raíz del script
+logRootFolders(rootFolder);
