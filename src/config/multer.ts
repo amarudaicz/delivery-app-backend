@@ -16,8 +16,6 @@ const upload = multer({ storage: storage });
 export default upload;
 
 // logFolderStructure.js
-import fs from 'fs';
-
 
 // function logRootFolders(rootPath:any) {
 //   const items = fs.readdirSync(rootPath);
