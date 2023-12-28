@@ -64,10 +64,9 @@ export const getProduct = async (req: Request, res: Response) => {
 export const postProduct = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user as Admin;
-    let imageUrl:any = null;
     
-    const { name, price,image, category_id, description, variations, ingredients } = req.body as Product;
-    
+    const { name, price ,image, category_id, description, variations, ingredients } = req.body as Product;
+      
       const data = await doQuery(
         `INSERT INTO ?? (name, local_id, image, price, ingredients, category_id, description, variations) VALUES(?,?,?,?,?,?,?,?)`,
         [user.admin_table, name, user.local_id, image, price, ingredients, category_id, description === 'Null' ? null : description, variations]
@@ -105,6 +104,8 @@ export const deleteProduct = async (req: Request, res: Response) => {
 export const updateProduct = async (req: Request, res: Response) => {
   try {
     const user  = (req as any).user as Admin;
+    
+    console.log(req.body);
     
     const {
       id,

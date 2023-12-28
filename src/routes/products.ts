@@ -21,7 +21,7 @@ const router = Router();
 router.get('/:table?', checkToken, insertUserRequest, getProducts);
 router.get('/get-one/:local/:id', getProduct);
 
-router.post('/', checkTokenStrict, checkUserState, capitalize(false, ['name', 'description']), postProduct);
+router.post('/', checkTokenStrict, checkUserState,  capitalize(false, ['name', 'description']), postProduct);
 
 router.put('/update-stock', checkTokenStrict, checkUserState, updateStockProduct);
 router.put('/update-fixed', checkTokenStrict, checkUserState, updateFixedProduct);

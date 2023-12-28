@@ -17,9 +17,6 @@ dotenv.config({path:envFilePath})
 cloudConfig()
 poolConnection()
 
-const uploadDirectory = path.resolve(__dirname, './uploads');
-console.log(uploadDirectory);
-
 const PORT = process.env.PORT || 3001
 export const app = express()
 
