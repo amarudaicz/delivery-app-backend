@@ -64,32 +64,11 @@ export const getProducts = async (req: Request, res: Response) => {
 export const postCategory = async (req: Request, res: Response) => {
   try {
 
-    const {category_name, category_description, sort_order} = req.body
+    const {category_name, category_description,image, sort_order} = req.body
     const {local_id, admin_table} = (req as any).user
-    
-    const file = req.file
-
-    let imageUrlCloudinary:null|string = null
-
-    if (file){
-      const imageUpload = await cloudinary.v2.uploader.upload(file.path, {
-        folder: admin_table,
-        public_id: category_name.replace(' ', '-' ).trim() || category_name,
-        overwrite: true,
-        quality: 90
-      });
-      
-      imageUrlCloudinary = imageUpload.secure_url;
-
-      fs.rm(file.path, ()=> console.log(`rm(${file.path})`))
-    }
-
   
-    
 
-    
-
-    const data = await doQuery(`INSERT INTO categories (category_name, category_image,category_description, sort_order, local_id) VALUES(?,?,?,?,?)`, [category_name, imageUrlCloudinary,category_description, sort_order, local_id])
+    const data = await doQuery(`INSERT INTO categories (category_name, category_image,category_description, sort_order, local_id) VALUES(?,?,?,?,?)`, [category_name, image,category_description, sort_order, local_id])
     
 
     res.send(data).status(200)

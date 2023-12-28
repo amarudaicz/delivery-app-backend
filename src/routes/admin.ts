@@ -18,8 +18,8 @@ router.get('/products', checkTokenStrict, checkUserState, getProducts )
 
 //CATEGORIES
 router.get('/get-categories',checkTokenStrict, checkUserState, getCategories); 
-router.post('/categories', checkTokenStrict, checkUserState, upload.single('image'), postCategory);
-router.put('/categories', checkTokenStrict, checkUserState, upload.single('image'), updateCategory);
+router.post('/categories', checkTokenStrict, checkUserState,  postCategory);
+router.put('/categories', checkTokenStrict, checkUserState, updateCategory);
 router.put('/categories/set-active', checkTokenStrict, checkUserState, stateCategory);
 router.delete('/categories/:id', checkTokenStrict, checkUserState, deleteCategory);
 router.put('/categories/sort-order', checkTokenStrict, checkUserState, putSortOrder);  

@@ -64,34 +64,13 @@ export const getProduct = async (req: Request, res: Response) => {
 export const postProduct = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user as Admin;
-    const image = req.file;
     let imageUrl:any = null;
     
-    const { name, price, category_id, description, variations, ingredients } = req.body as Product;
-    
-    if (image) {
-      try {
-        const imageUpload = await cloudinary.v2.uploader.upload(image.path, { 
-          folder: user.admin_table,
-          public_id: name.replace(' ', '-' ).trim() || name,
-          overwrite: true,
-          quality: 90,
-          eager_async:true, 
-        });
-
-        console.log(imageUpload);
-        imageUrl = imageUpload.secure_url;
-        console.log('paso hasta aca');
-        rm(image.path, ()=> console.log('rm->' + image.path))
-      } catch (err) {
-        console.log(err);
-         return httpError(res, 'A ocurrido un error al cargar tu imagen, intenta nuevamente en unos minutos')
-      }
-    }
+    const { name, price,image, category_id, description, variations, ingredients } = req.body as Product;
     
       const data = await doQuery(
         `INSERT INTO ?? (name, local_id, image, price, ingredients, category_id, description, variations) VALUES(?,?,?,?,?,?,?,?)`,
-        [user.admin_table, name, user.local_id, imageUrl, price, ingredients, category_id, description === 'Null' ? null : description, variations]
+        [user.admin_table, name, user.local_id, image, price, ingredients, category_id, description === 'Null' ? null : description, variations]
       );
 
       console.log({this:data});
@@ -126,9 +105,6 @@ export const deleteProduct = async (req: Request, res: Response) => {
 export const updateProduct = async (req: Request, res: Response) => {
   try {
     const user  = (req as any).user as Admin;
-
-    const file = req.file;
-    let imageUrl:any = null;
     
     const {
       id,
@@ -140,22 +116,10 @@ export const updateProduct = async (req: Request, res: Response) => {
       image
     } = req.body;
 
-    
-
-    if (file) {
-      const imageUpload = await cloudinary.v2.uploader.upload(file.path, {
-        folder: user.admin_table,
-        public_id: name,
-        overwrite: true,
-        quality: 90
-      });
-      
-      imageUrl = imageUpload.secure_url;
-    }
-
+  
     const data = await doQuery(
       `UPDATE ${user.admin_table} SET name=?, image=?, price=?, ingredients=?, description=?, variations=? WHERE id = ? `,
-      [name, imageUrl ? imageUrl : (image === 'null' ? null : image), price, ingredients, description === 'null' ? null : description, variations, id]
+      [name, image, price, ingredients, description === 'null' ? null : description, variations, id]
     );
 
 
