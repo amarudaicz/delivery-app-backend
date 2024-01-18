@@ -10,8 +10,8 @@ export const checkUserState = async ( req:Request|any, res:Response, next:NextFu
         
         const user = (await UserModel.getUser(id))[0]   
         
-        if(!user.active) return httpError(res, 'Tu cuenta se encuentra inactiva, porfavor ponte en contacto con nosotros', 401)
-        if(!user.sub_id) return httpError(res, 'Tu cuenta no tiene un metodo de pago activo, porfavor ponte en contacto con nosotros', 402)
+        if(!user.active) return httpError(res, 'Tu cuenta se encuentra inactiva, ponte en contacto con nosotros', 401)
+        if(!user.sub_id) return httpError(res, 'Tu cuenta no tiene un método de pago activo, ponte en contacto con nosotros', 402)
 
         
         req.user = user

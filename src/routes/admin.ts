@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { deleteAccount, deleteCategory, deleteOptionGroup, getCategories, getProducts, postAdmin, postCategory, postOptions, putOptions, putSortOrder, stateCategory, updateCategory } from '../controllers/admin';
+import { deleteAccount, deleteCategory, deleteOptionGroup, getCategories, getProducts, postAdmin, postCategory, postOptions, putOptions, putSortOrder, stateCategory, updateCategory, resetPasswordAdmin } from '../controllers/admin';
 import { checkTokenStrict } from '../middleware/checkToken';
 import upload from '../config/multer';
 import multer from 'multer';
@@ -31,13 +31,14 @@ router.delete('/delete-account', checkTokenStrict, insertUserRequest, deleteAcco
 
 //CRUD PARA MANEJAR EL ARRAY DE OPCIONES DEL LOCAL Y LA ACTUALIZACION DE PRODUCTOS EN LA TABLA 
 router.post('/options-group',  checkTokenStrict, checkUserState, postOptions);
-
 router.put('/options-group', checkTokenStrict, checkUserState, putOptions);
-
 router.delete('/options-group/:id', checkTokenStrict, checkUserState, deleteOptionGroup);
 
 
 
+
+//ACCOUNT
+router.put('/reset-password', checkTokenStrict, checkUserState, resetPasswordAdmin);
 
 
 export { router };

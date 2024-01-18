@@ -19,7 +19,7 @@ export class UserModel {
     return doQuery(`select * from users`, []);
   }
 
-  public static updateUser(user:User): Promise<ResultSetHeader> {
+  public static updateUser(user:User|any): Promise<ResultSetHeader> {
     return doQuery(`UPDATE users SET ? WHERE id = ?`, [user, user.id]);
   }
 

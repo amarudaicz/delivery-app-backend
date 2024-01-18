@@ -17,6 +17,8 @@ export class AdminModel {
         newAdmin['admin'] = 1
         newAdmin['password'] = await hash(newAdmin['password'], salt)
 
+        console.log(newAdmin);
+        
         return doQuery<ResultSetHeader>(
             'INSERT INTO users SET ?;',[newAdmin]
         );

@@ -11,7 +11,7 @@ import { AdminModel } from '../models/admin-model';
 import { UserModel } from '../models/user';
 import { LocalModel } from '../models/local-model';
 import { SubscriptionModel } from '../models/subscription-model';
-
+import * as bcrypt from 'bcrypt'
 
 
 
@@ -343,4 +343,31 @@ export const deleteAccount = async (req: Request, res: Response) => {
   }
 
 }
+
+
+export const resetPasswordAdmin = async (req: Request, res: Response) => {
+  try {
+    const { user, currentPassword, newPassword }:{currentPassword:string, newPassword:string, user:User} = req as any
+    const checkPassword = await bcrypt.compare(currentPassword, user.password)
+
+    if (!checkPassword) {
+      res.json({error:'Las contraseñas actual es incorrecta'})
+      return
+    }
+    const encryptPassword = await bcrypt.hash(newPassword, 10)
+    const updateUser = await UserModel.updateUser({id:user.id, password:encryptPassword})
+
+    if (!updateUser.affectedRows) {
+      return httpError(res, 'error query sql')
+    }
+
+    res.json(true)
+  } catch (err:any) {
+      console.log(err);
+      httpError(res, err, 403)
+  }
+
+}
   
+  
+
