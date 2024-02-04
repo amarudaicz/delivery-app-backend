@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 import { checkData } from "../utils/checkData";
 import { Admin } from "../interface/admin";
 import { Product } from "../interface/product";
-import * as xlsx from "xlsx";
+// import * as xlsx from "xlsx";
 import { rm } from "fs";
 
 export const getProducts = async (req: Request, res: Response) => {
@@ -140,25 +140,25 @@ export const updateStockProduct = async (req: Request, res: Response) => {
   }
 };
 
-export const uploadExcelProducts = async (req: Request, res: Response) => {
-  try {
-    const excel = req.file;
-    const user = (req as any).user as Admin;
-    const workbook = xlsx.readFile(excel!.path);
-    const sheetName = workbook.SheetNames[0];
-    const workSheet = workbook.Sheets[sheetName];
-    const jsonData:Product[] = xlsx.utils.sheet_to_json(workSheet);
+// export const uploadExcelProducts = async (req: Request, res: Response) => {
+//   try {
+//     const excel = req.file;
+//     const user = (req as any).user as Admin;
+//     const workbook = xlsx.readFile(excel!.path);
+//     const sheetName = workbook.SheetNames[0];
+//     const workSheet = workbook.Sheets[sheetName];
+//     const jsonData:Product[] = xlsx.utils.sheet_to_json(workSheet);
 
 
-    for (let i = 0; i < jsonData.length; i ++) {
-        await doQuery(`INSERT INTO products SET ?`, [
-          jsonData[i],
-        ]);
-    }
+//     for (let i = 0; i < jsonData.length; i ++) {
+//         await doQuery(`INSERT INTO products SET ?`, [
+//           jsonData[i],
+//         ]);
+//     }
 
-    res.send("ok");
-  } catch (err: any) {
-    console.log(err);
-    httpError(res, err, 403);
-  }
-};
+//     res.send("ok");
+//   } catch (err: any) {
+//     console.log(err);
+//     httpError(res, err, 403);
+//   }
+// };
