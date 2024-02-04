@@ -1,5 +1,4 @@
 import * as mp from 'mercadopago'
-import { CreateCustomerPayload } from 'mercadopago/models/customers/create-payload.model';
 
 mp.configure({
     client_id:'4005782578666910',
