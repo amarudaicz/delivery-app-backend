@@ -1,9 +1,18 @@
 import { ResultSetHeader } from "mysql2";
 import { Local, NewLocal } from "../interface/local";
 import { doQuery } from "../mysql/config";
+import { Product } from "../interface/product";
 
 export class LocalModel {
   constructor() {}
+ 
+  public static getLocal(name_url: NewLocal) {
+   
+    return doQuery<Local[]>('SELECT * FROM locals WHERE name_url = ? AND active = 1 ;', [
+      name_url,
+    ])
+  }
+
 
   public static postLocal(newLocal: NewLocal) {
     return doQuery<ResultSetHeader>("INSERT INTO locals SET ?", [newLocal]);
@@ -42,6 +51,25 @@ export class LocalModel {
       [name_url]
     );
   }
+
+  public static async getProducts(local_id:number){
+    return await doQuery<Product[]>(
+      `SELECT 
+      products.id, name, stock, price, ingredients, products.local_id, image,
+        category_id, category_name, category_image,
+        categories.active as category_active, categories.sort_order as category_sort,
+        variations, description, fixed, galery
+      FROM
+        products
+      INNER JOIN 
+        categories ON categories.id = products.category_id AND categories.local_id = products.local_id
+      WHERE
+        products.local_id = ?;`,
+      [local_id]
+    );
+  }
+
+
 }
 
 // ALTER TABLE ${name_url}

@@ -20,12 +20,17 @@ const pool = mysql2.createPool(process.env.DB_URI as PoolOptions)
 
  
 
-export const poolConnection = () => {
-  pool.getConnection((err) => {
+export const poolConnection = async () => {
+ 
+
+  pool.getConnection( async (err) => {
     if (err) { 
       console.log(err);
     } else {
       console.log("R");
+      // await doQuery(`INSERT INTO products ( id, name, price, image,description,ingredients,variations,stock, local_id, category_id, fixed)
+      // SELECT *
+      // FROM mitienda;`, [])
     } 
   }); 
 }; 

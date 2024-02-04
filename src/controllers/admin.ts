@@ -244,7 +244,7 @@ export const putOptions = async (req: Request, res: Response) => {
       return 
     }
 
-    const productsRecovery:Product[] | any[] = await doQuery(`SELECT * FROM ?? WHERE id IN (?)`, [user.admin_table, products.join(',')])
+    const productsRecovery:Product[] | any[] = await doQuery(`SELECT * FROM products WHERE id IN (?)`, [products.join(',')])
 
 
     const updatedProducts = productsRecovery.map((product: any) => {
@@ -256,7 +256,7 @@ export const putOptions = async (req: Request, res: Response) => {
     
     // Construir la consulta SQL con múltiples valores
     const updateQuery = `
-      UPDATE ??
+      UPDATE products
       SET variations = CASE 
         ${updatedProducts.map((product: any) => `WHEN id = ${product.id} THEN '${JSON.stringify(product.variations)}'`).join(' ')}
         ELSE variations
@@ -264,7 +264,7 @@ export const putOptions = async (req: Request, res: Response) => {
       WHERE id IN (${products.join(',')})
     `;
 
-    const data = await doQuery(updateQuery, [user.admin_table]);
+    const data = await doQuery(updateQuery, []);
     
 
     res.send(data).status(200)
@@ -334,7 +334,7 @@ export const deleteAccount = async (req: Request, res: Response) => {
     }
     const deleteUser = await UserModel.deleteUser(user.id)
     const deleteLocal = await LocalModel.deleteLocal(user.local_id)
-    const deleteTableProducts = await LocalModel.deleteTableProducts(user.admin_table)
+    // const deleteTableProducts = await LocalModel.deleteTableProducts(user.admin_table)
 
     res.json({exit:true})
   } catch (err:any) {
@@ -347,21 +347,26 @@ export const deleteAccount = async (req: Request, res: Response) => {
 
 export const resetPasswordAdmin = async (req: Request, res: Response) => {
   try {
-    const { user, currentPassword, newPassword }:{currentPassword:string, newPassword:string, user:User} = req as any
-    const checkPassword = await bcrypt.compare(currentPassword, user.password)
+    const { currentPassword, password }:{currentPassword:string, password:string} = req.body
+    const user:Admin = (req as any).user
 
+    console.log(req.body, user);
+    const checkPassword = await bcrypt.compare(currentPassword, user.password)
+    console.log(checkPassword);
+    
     if (!checkPassword) {
-      res.json({error:'Las contraseñas actual es incorrecta'})
+      res.json({error:'La contraseña actual es incorrecta'})
       return
     }
-    const encryptPassword = await bcrypt.hash(newPassword, 10)
+
+    const encryptPassword = await bcrypt.hash(password, 10)
     const updateUser = await UserModel.updateUser({id:user.id, password:encryptPassword})
 
     if (!updateUser.affectedRows) {
       return httpError(res, 'error query sql')
     }
 
-    res.json(true)
+    res.json({ok:true})
   } catch (err:any) {
       console.log(err);
       httpError(res, err, 403)

@@ -7,6 +7,7 @@ import {
   postProduct,
   updateStockProduct,
   updateFixedProduct,
+  uploadExcelProducts,
   
 } from '../controllers/products';
 import { checkToken, checkTokenStrict } from '../middleware/checkToken';
@@ -22,6 +23,8 @@ router.get('/:table?', checkToken, insertUserRequest, getProducts);
 router.get('/get-one/:local/:id', getProduct);
 
 router.post('/', checkTokenStrict, checkUserState,  capitalize(false, ['name', 'description']), postProduct);
+
+router.post('/excel', checkTokenStrict, checkUserState, upload.single('file'), uploadExcelProducts);
 
 router.put('/update-stock', checkTokenStrict, checkUserState, updateStockProduct);
 router.put('/update-fixed', checkTokenStrict, checkUserState, updateFixedProduct);

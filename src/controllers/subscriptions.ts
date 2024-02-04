@@ -10,17 +10,15 @@ export const postSubscription = async (req: Request, res: Response) => {
     console.log(req.body);
     const { token, payer, store, user } = req.body;
 
-    const subscription: { id: string; payer_id: number } =
-      await SubscriptionModel.post({ token, payer });
+    const subscription: { id: string; payer_id: number } = await SubscriptionModel.post({ token, payer });
     console.log(subscription);
-
     if (!subscription.id) {
       httpError(res, "ERROR_EN_EL_PAGO");
       return;
     }
 
     const local = await LocalModel.postLocal(store);
-    const tableProducts = await LocalModel.createTableProducts(store.name_url);
+    // const tableProducts = await LocalModel.createTableProducts(store.name_url);
     const admin = await AdminModel.postAdmin({
       ...user,
       local_id: local.insertId,

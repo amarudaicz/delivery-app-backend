@@ -6,32 +6,37 @@ import { Admin } from '../interface/admin';
 import { parseJson } from '../utils/parseData';
 import { Local, NewLocal } from '../interface/local';
 import { LocalModel } from '../models/local-model';
+import { Product } from '../interface/product';
 
 export const getLocal = async (req: Request, res: Response) => {
 
   try {
-    const table = req.params.local || (req as any).user?.admin_table
+    const name_url = req.params.local || (req as any).user?.admin_table
 
-    if (!table) return httpError(res, 'No hay tabla para consultar', 403)
+    if (!name_url) return httpError(res, 'No hay tabla para consultar', 403)
 
-    const data:Local[] = await doQuery('SELECT * FROM locals WHERE name_url = ? AND active = 1 ;', [
-      table,
-    ]);
+    const local:Local[] = await LocalModel.getLocal(name_url);
 
+    let products: any[] = await LocalModel.getProducts(local[0].id)
 
-    if (checkData(data)) {
+    if (checkData(local)) {
       return httpError(res, 'No se a encontrado el local', 403);
     }
 
-    data[0].schedules ? data[0].schedules = JSON.parse(data[0].schedules): null
-    data[0].options_group ? data[0].options_group = JSON.parse(data[0].options_group): null
-    data[0].links = parseJson(data[0].links)
-    data[0].shipping = parseJson(data[0].shipping)
-    data[0].pay_methods = parseJson(data[0].pay_methods)
+    local[0].schedules = parseJson(local[0].schedules)
+    local[0].options_group = parseJson(local[0].options_group)
+    local[0].links = parseJson(local[0].links)
+    local[0].shipping = parseJson(local[0].shipping)
+    local[0].pay_methods = parseJson(local[0].pay_methods)
 
+    for (let i = 0; i < products.length; i++) {
+      const { variations, ingredients, galery } = products[i];
+      products[i].variations = parseJson(variations);
+      products[i].ingredients = parseJson(ingredients);
+      products[i].galery = parseJson(galery);
+    }
 
-    res.json(data);
-
+    res.json({local:local[0], products});
   } catch (err: any) {
     console.log(err);
     httpError(res, err, 403);

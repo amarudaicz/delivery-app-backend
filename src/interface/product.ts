@@ -10,6 +10,7 @@ export interface Product {
     description:     string;
     ingredients:    string;
     variations:     Variation[];
+    galery: string[]
 }
 
 export interface Variation {

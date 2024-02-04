@@ -3,8 +3,8 @@ import { doQuery } from "../mysql/config";
 import { Request, Response } from "express";
 import { checkData } from "../utils/checkData";
 import { Admin } from "../interface/admin";
-import * as cloudinary from "cloudinary";
 import { Product } from "../interface/product";
+import * as xlsx from "xlsx";
 import { rm } from "fs";
 
 export const getProducts = async (req: Request, res: Response) => {
@@ -20,7 +20,7 @@ export const getProducts = async (req: Request, res: Response) => {
     //INTERFACE Product
     let data: any[] = await doQuery(
       `SELECT ??.id, name, stock, price, ingredients, ??.local_id, image, category_id, category_name, category_image, categories.active as category_active, categories.sort_order as category_sort, variations, description, fixed FROM ?? INNER JOIN categories ON categories.id = ??.category_id AND categories.local_id = ??.local_id`,
-      [table,table,table,table,table]
+      [table, table, table, table, table]
     );
 
     for (let i = 0; i < data.length; i++) {
@@ -31,6 +31,8 @@ export const getProducts = async (req: Request, res: Response) => {
         ? (data[i].ingredients = JSON.parse(data[i].ingredients))
         : null;
     }
+
+    
     res.json(data);
   } catch (err: any) {
     console.log(err);
@@ -67,11 +69,10 @@ export const postProduct = async (req: Request, res: Response) => {
     product.local_id = user.local_id;
     console.log(product);
 
-    const data = await doQuery(
-      `INSERT INTO ?? SET ?`,
-      [user.admin_table, product]
-    );
-
+    const data = await doQuery(`INSERT INTO products SET ?`, [
+      product,
+    ]);
+ 
     return res.json(data);
   } catch (err: any) {
     console.log(err);
@@ -83,7 +84,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { admin_table } = (req as any).user;
-    const data = await doQuery(`DELETE FROM ${admin_table} WHERE id = ?;`, [
+    const data = await doQuery(`DELETE FROM products WHERE id = ?;`, [
       Number(id),
     ]);
     res.json(data);
@@ -97,8 +98,7 @@ export const updateProduct = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user as Admin;
     const product = req.body as Product;
-    const data = await doQuery(`UPDATE ?? SET ? WHERE id = ? `, [
-      user.admin_table,
+    const data = await doQuery(`UPDATE products SET ? WHERE id = ? `, [
       product,
       product.id,
     ]);
@@ -114,10 +114,10 @@ export const updateFixedProduct = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user as Admin;
     const { id, fixed } = req.body;
-    const data = await doQuery(
-      `UPDATE ?? SET fixed = ? WHERE id = ?`,
-      [user.admin_table, fixed, id]
-    );
+    const data = await doQuery(`UPDATE products SET fixed = ? WHERE id = ?`, [
+      fixed,
+      id,
+    ]);
     res.json(data);
   } catch (err: any) {
     console.log(err);
@@ -129,11 +129,34 @@ export const updateStockProduct = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user as Admin;
     const { id: idProduct, stock } = req.body;
-    const data = await doQuery(
-      `UPDATE ?? SET stock = ? WHERE id = ?`,
-      [user.admin_table, stock, idProduct]
-    );
+    const data = await doQuery(`UPDATE products SET stock = ? WHERE id = ?`, [
+      stock,
+      idProduct,
+    ]);
     res.json(data);
+  } catch (err: any) {
+    console.log(err);
+    httpError(res, err, 403);
+  }
+};
+
+export const uploadExcelProducts = async (req: Request, res: Response) => {
+  try {
+    const excel = req.file;
+    const user = (req as any).user as Admin;
+    const workbook = xlsx.readFile(excel!.path);
+    const sheetName = workbook.SheetNames[0];
+    const workSheet = workbook.Sheets[sheetName];
+    const jsonData:Product[] = xlsx.utils.sheet_to_json(workSheet);
+
+
+    for (let i = 0; i < jsonData.length; i ++) {
+        await doQuery(`INSERT INTO products SET ?`, [
+          jsonData[i],
+        ]);
+    }
+
+    res.send("ok");
   } catch (err: any) {
     console.log(err);
     httpError(res, err, 403);
