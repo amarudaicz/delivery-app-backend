@@ -11,7 +11,6 @@ import path from 'path';
 import './tasks/cronTasks'
 import './config/mercadopago'
 import {poolConnection } from './mysql/config';
-
     
 const envFilePath = path.resolve(__dirname, '../.env'); 
 dotenv.config({path:envFilePath})
@@ -27,9 +26,8 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false, }));
 app.use(morgan('dev'))
 
-app.use(router)
-
-
+app.use(router);
+ 
 app.listen(PORT, () => {
     console.log('app listen on port ' + PORT);
 })

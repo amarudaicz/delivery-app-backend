@@ -4,9 +4,10 @@ import { Request, Response } from "express";
 import { checkData } from "../utils/checkData";
 import { Admin } from "../interface/admin";
 import { Product } from "../interface/product";
-// import * as xlsx from "xlsx";
-import { rm } from "fs";
 
+
+
+ 
 export const getProducts = async (req: Request, res: Response) => {
   try {
     const table: string = req.params.table || (req as any).user?.admin_table;
@@ -55,7 +56,6 @@ export const getProduct = async (req: Request, res: Response) => {
 
     res.json(data);
   } catch (err: any) {
-    // httpError(res, err, 403);
     res.status(403).json({ error: "asd" });
   }
 };
@@ -63,9 +63,7 @@ export const getProduct = async (req: Request, res: Response) => {
 export const postProduct = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user as Admin;
-
     const product = req.body as Product;
-
     product.local_id = user.local_id;
     console.log(product);
 
