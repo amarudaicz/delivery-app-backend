@@ -28,6 +28,7 @@ export const getLocal = async (req: Request, res: Response) => {
     local[0].links = parseJson(local[0].links)
     local[0].shipping = parseJson(local[0].shipping)
     local[0].pay_methods = parseJson(local[0].pay_methods)
+    local[0].fields_checkout = parseJson(local[0].fields_checkout)
 
     for (let i = 0; i < products.length; i++) {
       const { variations, ingredients, galery } = products[i];

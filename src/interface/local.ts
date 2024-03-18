@@ -15,7 +15,8 @@ export interface Local {
   options_group: string;
   links: string;
   shipping:any,
-  pay_methods:any
+  pay_methods:any,
+  fields_checkout:any
 }
 
 export interface Schedules {

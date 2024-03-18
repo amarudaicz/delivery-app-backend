@@ -8,7 +8,7 @@ export class UserModel {
   public static getUser(id: any): Promise<User[]> {
     const searchBy = typeof id === "number" ? "id" : "username";
     
-    return doQuery(`select * from users WHERE ?? = ?`, [searchBy, id]);
+    return doQuery(`SELECT * FROM users WHERE ?? = ?`, [searchBy, id]);
   }
 
   public static postUser(user: User): Promise<User[]> {
@@ -16,7 +16,7 @@ export class UserModel {
   }
   
   public static getAllUsers(): Promise<User[]> {
-    return doQuery(`select * from users`, []);
+    return doQuery(`SELECT * FROM users`, []);
   }
 
   public static updateUser(user:User|any): Promise<ResultSetHeader> {

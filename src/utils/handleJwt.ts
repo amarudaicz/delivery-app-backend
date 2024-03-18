@@ -14,7 +14,6 @@ export const verifyJwt = (token: string) => {
     }
 }
 
-
 export const getPayload = (user:User) => {
     
     return {
@@ -27,12 +26,10 @@ export const getPayload = (user:User) => {
 
 }
 
-
-const encriptPass = async (pass:string)=>{
+const encriptPass = async (pass:string) => {
     const salt = await genSalt(10)
     const password = await hash(pass, salt)
     console.log(password);
 }
 
-encriptPass('tala');
-
+encriptPass('mainumbi2024');
