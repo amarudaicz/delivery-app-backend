@@ -111,9 +111,10 @@ export const verifyToken = async (req: Request, res: Response) => {
         const token = req.query.token as string
         
         const isValid:any = verifyJwt(token)
+        console.log(isValid);
         
         if (!isValid) {
-            httpError(res, 'El link no es valido o expiró porfavor repita el proceso')
+            res.json(false)
             return 
         }
 
