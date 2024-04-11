@@ -33,6 +33,8 @@ export class SubscriptionModel {
 
   public static async get(sub_id:string) {
 
+    console.log(sub_id);
+    
     const sub = await fetch(`${this.baseUrlMp}/preapproval/${sub_id}`, {
       method: "GET",
       headers: {
@@ -42,9 +44,10 @@ export class SubscriptionModel {
       },
     });
 
+    console.log(sub);
     const subData = await sub.json();
-    console.log(subData);
-    
+      console.log(subData);
+      
     return subData;
   }
 

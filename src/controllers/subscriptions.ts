@@ -36,10 +36,17 @@ export const postSubscription = async (req: Request, res: Response) => {
 export const getSubscription = async (req: Request | any, res: Response) => {
   try {
     const { sub_id } = req.user;
+    console.log(sub_id);
+
 
     const sub = await SubscriptionModel.get(sub_id);
-
-    res.json(sub);
+    console.log(sub);
+    try {
+      res.json(sub);
+    } catch (err) {
+      res.send(false)      
+    }
+    
   } catch (err:any) {
     console.log(err);
     httpError(res, err)
