@@ -44,11 +44,15 @@ export class SubscriptionModel {
       },
     });
 
-    console.log(sub);
-    const subData = await sub.json();
-      console.log(subData);
+    try {
+      const subData = await sub.json();
+      return subData;
+    } catch (err) {
+      return {
+        err:'freetype'
+      }      
+    }
       
-    return subData;
   }
 
   public static async put(body:any, sub_id:string) {
