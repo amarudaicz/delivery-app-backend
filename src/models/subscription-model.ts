@@ -46,8 +46,12 @@ export class SubscriptionModel {
 
     try {
       const subData = await sub.json();
+      console.log(subData);
+      
       return subData;
     } catch (err) {
+      console.log(err);
+      
       return {
         err:'freetype'
       }      

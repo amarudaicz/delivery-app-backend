@@ -41,12 +41,8 @@ export const getSubscription = async (req: Request | any, res: Response) => {
 
     const sub = await SubscriptionModel.get(sub_id);
     console.log(sub);
-    try {
-      res.json(sub);
-    } catch (err) {
-      res.send(false)      
-    }
     
+    res.json(sub);
   } catch (err:any) {
     console.log(err);
     httpError(res, err)
