@@ -34,7 +34,6 @@ export class OrderController{
             const {user}:{user:User} = req as any
 
             const orders = await this.orderUseCase.recoveryOrdersAdmin(user.local_id)
-            console.log(orders);
                 
             res.json(orders)
         }

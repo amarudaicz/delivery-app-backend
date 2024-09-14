@@ -2,7 +2,7 @@ export interface Order {
     name: string;
     local_id:number;
     payMethod: string;
-    shippingMethod: string;
+    shippingMethod: string|null;
     direction: string;
     streetNumber: string;
     amountReceived: number;
@@ -24,11 +24,11 @@ interface BaseOrderValue {
     total_amount: number;
     local_id: number;
     payment_method: string;
-    shipping_address: string;
+    shipping_address: string|null;
     shipping_reference: string | null;
     cart:string|ItemCart[],
     status:StatusType;
-    watched_admin:number;
+    watched_admin:number;    
   }
   
   export interface OrderEntity extends BaseOrderValue {}

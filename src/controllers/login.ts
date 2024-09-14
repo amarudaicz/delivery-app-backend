@@ -19,7 +19,6 @@ import { LocalModel } from "../models/local-model";
 export const login = async (req: Request, res: Response) => {
     try {
         const { username, password } = req.body
-        // let user = await doQuery<any>(`select * from users WHERE username = ?`, [username])
         const user = (await UserModel.getUser(username))[0]
         
         if (!user) {

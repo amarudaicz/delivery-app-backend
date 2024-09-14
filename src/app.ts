@@ -10,7 +10,7 @@ import { router } from './routes';
 import path from 'path';
 import './tasks/cronTasks'
 import './config/mercadopago'
-import {poolConnection } from './mysql/config';
+import {doQuery, poolConnection } from './mysql/config';
     
 const envFilePath = path.resolve(__dirname, '../.env'); 
 dotenv.config({path:envFilePath})
@@ -31,3 +31,4 @@ app.use(router);
 app.listen(PORT, () => {
     console.log('app listen on port ' + PORT);
 })
+

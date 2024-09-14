@@ -10,10 +10,15 @@ export class OrderUseCase{
     }
 
     public createOrder = async (order:Order) => {
+        console.log({order});
+        
         const orderValue = new OrderValue(order)
+        console.log({orderValue});
+        
         const orderCreated = await this.orderRepository.postOrder(orderValue)
         return orderCreated
     }
+    
 
     public recoveryOrdersAdmin = async (local_id:number) => {
         const allOrders = await this.orderRepository.getOrdersByLocalId(local_id)
@@ -32,8 +37,6 @@ export class OrderUseCase{
             allOrders[i].cart = parseJson(allOrders[i].cart as string)
         }
 
-        console.log(allOrders);
-        
         return allOrders
     }
 
