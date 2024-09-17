@@ -6,7 +6,7 @@ export class OrderValue implements PostOrderValue {
     this.total_amount = order.subtotal + (order.costShipping || 0);
     this.local_id = order.local_id;
     this.payment_method = order.payMethod;
-    this.shipping_address = order.shippingMethod === 'Buscar en el local' ? null : this.formatAdress(order.direction, order.streetNumber);
+    this.shipping_address = order.shippingMethod === 'Buscar en el local' ? null : order.ubication;
     this.shipping_reference = order.reference;
     this.status = "pendiente";
     this.cart = JSON.stringify(order.cart);
@@ -27,8 +27,8 @@ export class OrderValue implements PostOrderValue {
     if (!streetNumber) return direction
 
     street += ` ${streetNumber}`
-    
-    return `${street}, ${rest.join(',')}`
+
+    return `${street}, ${rest.join('  ,')}`
   }
   
   customer_phone:number
